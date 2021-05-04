@@ -2,8 +2,8 @@ package http
 
 import (
 	"fmt"
-	"github.com/aaronland/go-http-rewrite"
 	"github.com/aaronland/go-http-maps/static"
+	"github.com/aaronland/go-http-rewrite"
 	"io/fs"
 	gohttp "net/http"
 	"path/filepath"

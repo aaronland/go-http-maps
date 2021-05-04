@@ -1,7 +1,5 @@
 window.addEventListener("load", function load(event){
 
-    console.log("LOAD");
-    
     var map_el = document.getElementById("map");
     var map = aaronland.maps.getMap(map_el);
 

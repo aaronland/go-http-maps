@@ -3,7 +3,7 @@
 github.com/aaronland/go-http-bootstrap
 github.com/aaronland/go-http-bootstrap/resources
 github.com/aaronland/go-http-bootstrap/static
-# github.com/aaronland/go-http-leaflet v0.0.6
+# github.com/aaronland/go-http-leaflet v0.0.7
 github.com/aaronland/go-http-leaflet
 github.com/aaronland/go-http-leaflet/static
 # github.com/aaronland/go-http-rewrite v0.0.6
@@ -12,7 +12,7 @@ github.com/aaronland/go-http-rewrite
 # github.com/aaronland/go-http-server v0.0.6
 ## explicit
 github.com/aaronland/go-http-server
-# github.com/aaronland/go-http-tangramjs v0.0.9
+# github.com/aaronland/go-http-tangramjs v0.0.10
 ## explicit
 github.com/aaronland/go-http-tangramjs
 github.com/aaronland/go-http-tangramjs/static
@@ -27,7 +27,7 @@ github.com/aws/aws-lambda-go/lambdacontext
 # github.com/sfomuseum/go-flags v0.8.2
 ## explicit
 github.com/sfomuseum/go-flags/flagset
-# github.com/sfomuseum/go-http-protomaps v0.0.6
+# github.com/sfomuseum/go-http-protomaps v0.0.7
 ## explicit
 github.com/sfomuseum/go-http-protomaps
 github.com/sfomuseum/go-http-protomaps/static
