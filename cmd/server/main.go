@@ -5,8 +5,8 @@ import (
 	"github.com/aaronland/go-http-bootstrap"
 	"github.com/aaronland/go-http-server"
 	"github.com/aaronland/go-http-tangramjs"
-	"github.com/aaronland/go-privatezen/http"
-	"github.com/aaronland/go-privatezen/templates/html"
+	"github.com/aaronland/go-http-maps/http"
+	"github.com/aaronland/go-http-maps/templates/html"
 	"github.com/sfomuseum/go-flags/flagset"
 	"html/template"
 	"log"
@@ -67,30 +67,30 @@ func main() {
 		log.Fatalf("Failed to append static asset handlers, %v")
 	}
 
-	event_opts := &http.EventHandlerOptions{
+	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
 		InitialLatitude:  *initial_latitude,
 		InitialLongitude: *initial_longitude,
 		InitialZoom:      *initial_zoom,
 	}
 
-	event_handler, err := http.EventHandler(event_opts)
+	map_handler, err := http.MapHandler(map_opts)
 
 	if err != nil {
-		log.Fatalf("Failed to create event handler, %v", err)
+		log.Fatalf("Failed to create map handler, %v", err)
 	}
 
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
-	event_handler = bootstrap.AppendResourcesHandler(event_handler, bootstrap_opts)
+	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
 
 	tangramjs_opts := tangramjs.DefaultTangramJSOptions()
 	tangramjs_opts.Nextzen.APIKey = *nextzen_apikey
 	tangramjs_opts.Nextzen.StyleURL = *nextzen_style_url
 	tangramjs_opts.Nextzen.TileURL = *nextzen_tile_url
 
-	event_handler = tangramjs.AppendResourcesHandler(event_handler, tangramjs_opts)
+	map_handler = tangramjs.AppendResourcesHandler(map_handler, tangramjs_opts)
 
-	mux.Handle("/", event_handler)
+	mux.Handle("/", map_handler)
 
 	//
 

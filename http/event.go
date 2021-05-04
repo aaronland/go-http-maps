@@ -6,30 +6,30 @@ import (
 	gohttp "net/http"
 )
 
-type EventHandlerOptions struct {
+type MapHandlerOptions struct {
 	Templates        *template.Template
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
 }
 
-type EventHandlerVars struct {
+type MapHandlerVars struct {
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
 }
 
-func EventHandler(opts *EventHandlerOptions) (gohttp.Handler, error) {
+func MapHandler(opts *MapHandlerOptions) (gohttp.Handler, error) {
 
-	t := opts.Templates.Lookup("event")
+	t := opts.Templates.Lookup("map")
 
 	if t == nil {
-		return nil, errors.New("Missing 'event' template")
+		return nil, errors.New("Missing 'map' template")
 	}
 
 	fn := func(rsp gohttp.ResponseWriter, req *gohttp.Request) {
 
-		vars := EventHandlerVars{
+		vars := MapHandlerVars{
 			InitialLatitude:  opts.InitialLatitude,
 			InitialLongitude: opts.InitialLongitude,
 			InitialZoom:      opts.InitialZoom,

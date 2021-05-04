@@ -1,6 +1,6 @@
-var privatezen = privatezen || {};
+var aaronland = aaronland || {};
 
-privatezen.maps = (function(){
+aaronland.maps = (function(){
 
     var maps = {};
 

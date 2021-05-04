@@ -1,8 +1,0 @@
-{{ define "event" }}
-{{ template "inc_head" . }}
-<div id="map" data-map-renderer="tangramjs" data-initial-latitude="{{ .InitialLatitude }}" data-initial-longitude="{{ .InitialLongitude }}" data-initial-zoom="{{ .InitialZoom }}"></div>
-<script type="text/javascript" src="/javascript/privatezen.maps.js"></script>
-<script type="text/javascript" src="/javascript/privatezen.event.js"></script>
-<script type="text/javascript" src="/javascript/privatezen.event.init.js"></script>
-{{ template "inc_foot" . }}
-{{ end }}

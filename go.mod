@@ -1,4 +1,4 @@
-module github.com/aaronland/go-privatezen
+module github.com/aaronland/go-http-maps
 
 go 1.16
 

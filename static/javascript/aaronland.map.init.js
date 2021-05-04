@@ -3,7 +3,7 @@ window.addEventListener("load", function load(event){
     console.log("LOAD");
     
     var map_el = document.getElementById("map");
-    var map = privatezen.maps.getMap(map_el);
+    var map = aaronland.maps.getMap(map_el);
 
     var hash = new L.Hash(map);
     var hash_str = location.hash;
@@ -14,7 +14,7 @@ window.addEventListener("load", function load(event){
     
     if (hash_str){
 
-	var parsed = privatezen.maps.parseHash(hash_str);
+	var parsed = aaronland.maps.parseHash(hash_str);
 
 	if (parsed){
 	    init_lat = parsed['latitude'];

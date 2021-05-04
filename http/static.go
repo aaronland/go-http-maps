@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/aaronland/go-http-rewrite"
-	"github.com/aaronland/go-privatezen/static"
+	"github.com/aaronland/go-http-maps/static"
 	"io/fs"
 	gohttp "net/http"
 	"path/filepath"
