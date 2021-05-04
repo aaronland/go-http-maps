@@ -72,9 +72,7 @@ aaronland.maps = (function(){
 		return maps[map_id];
 	    }
 
-	    var map_args = {
-		'drawControl': true,
-	    };
+	    var map_args = {};
 	    
 	    var map = L.map("map", map_args);
 

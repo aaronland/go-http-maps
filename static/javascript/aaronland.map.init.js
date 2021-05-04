@@ -32,11 +32,36 @@ window.addEventListener("load", function load(event){
     map.addLayer(drawnItems);
     
     var drawControl = new L.Control.Draw({
+	draw: {
+                polyline: true,
+                polygon: true,
+                circle: false,
+                marker: true
+            },
         edit: {
             featureGroup: drawnItems
         }
     });
     
     map.addControl(drawControl);
-    
+
+    map.on(L.Draw.Event.CREATED, function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
+
+            drawnItems.addLayer(layer);
+        });
+
+        map.on(L.Draw.Event.EDITED, function (e) {
+            var layers = e.layers;
+            var countOfEditedLayers = 0;
+            layers.eachLayer(function(layer) {
+                countOfEditedLayers++;
+            });
+            console.log("Edited " + countOfEditedLayers + " layers");
+        });
 });
