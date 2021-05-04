@@ -1,0 +1,103 @@
+package main
+
+import (
+	"context"
+	"github.com/aaronland/go-http-bootstrap"
+	"github.com/aaronland/go-http-server"
+	"github.com/aaronland/go-http-tangramjs"
+	"github.com/aaronland/go-privatezen/http"
+	"github.com/aaronland/go-privatezen/templates/html"
+	"github.com/sfomuseum/go-flags/flagset"
+	"html/template"
+	"log"
+	gohttp "net/http"
+)
+
+func main() {
+
+	fs := flagset.NewFlagSet("privatezen")
+
+	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
+
+	nextzen_apikey := fs.String("nextzen-apikey", "", "A valid Nextzen API key")
+	nextzen_style_url := fs.String("nextzen-style-url", "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
+	nextzen_tile_url := fs.String("nextzen-tile-url", tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
+
+	initial_latitude := fs.Float64("initial-latitude", 37.61799, "A valid latitude for the map's initial view.")
+	initial_longitude := fs.Float64("initial-longitude", -122.370943, "A valid longitude for the map's initial view.")
+	initial_zoom := fs.Int("initial-zoom", 15, "A valid zoom level for the map's initial view.")
+
+	flagset.Parse(fs)
+
+	ctx := context.Background()
+
+	s, err := server.NewServer(ctx, *server_uri)
+
+	if err != nil {
+		log.Fatalf("Failed to create new server for '%s', %v", *server_uri, err)
+	}
+
+	t := template.New("geotag").Funcs(template.FuncMap{
+		//
+	})
+
+	t, err = t.ParseFS(html.FS, "*.html")
+
+	if err != nil {
+		log.Fatalf("Failed to parse templates, %v", err)
+	}
+
+	mux := gohttp.NewServeMux()
+
+	err = tangramjs.AppendAssetHandlers(mux)
+
+	if err != nil {
+		log.Fatalf("Failed to append TangramJS asset handlers, %v")
+	}
+
+	err = bootstrap.AppendAssetHandlers(mux)
+
+	if err != nil {
+		log.Fatalf("Failed to append Bootstrap asset handlers, %v")
+	}
+
+	err = http.AppendStaticAssetHandlers(mux)
+
+	if err != nil {
+		log.Fatalf("Failed to append static asset handlers, %v")
+	}
+
+	event_opts := &http.EventHandlerOptions{
+		Templates:        t,
+		InitialLatitude:  *initial_latitude,
+		InitialLongitude: *initial_longitude,
+		InitialZoom:      *initial_zoom,
+	}
+
+	event_handler, err := http.EventHandler(event_opts)
+
+	if err != nil {
+		log.Fatalf("Failed to create event handler, %v", err)
+	}
+
+	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
+	event_handler = bootstrap.AppendResourcesHandler(event_handler, bootstrap_opts)
+
+	tangramjs_opts := tangramjs.DefaultTangramJSOptions()
+	tangramjs_opts.Nextzen.APIKey = *nextzen_apikey
+	tangramjs_opts.Nextzen.StyleURL = *nextzen_style_url
+	tangramjs_opts.Nextzen.TileURL = *nextzen_tile_url
+
+	event_handler = tangramjs.AppendResourcesHandler(event_handler, tangramjs_opts)
+
+	mux.Handle("/", event_handler)
+
+	//
+
+	log.Printf("Listening on %s\n", s.Address())
+	err = s.ListenAndServe(ctx, mux)
+
+	if err != nil {
+		log.Fatalf("Failed to start server, %v", err)
+	}
+}
