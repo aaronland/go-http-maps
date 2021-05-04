@@ -53,7 +53,7 @@ aaronland.maps = (function(){
 		return null;
 	    }
 
-	    return self.getMap(map_el);
+	    return self.getMap(map_el, args);
 	},
 	
 	'getMap': function(map_el, args){
@@ -72,7 +72,11 @@ aaronland.maps = (function(){
 		return maps[map_id];
 	    }
 
-	    var map = L.map("map");
+	    var map_args = {
+		'drawControl': true,
+	    };
+	    
+	    var map = L.map("map", map_args);
 
 	    var map_renderer = map_el.getAttribute("data-map-renderer");
 	    
