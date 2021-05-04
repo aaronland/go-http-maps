@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/aaronland/go-http-bootstrap"
 	"github.com/aaronland/go-http-server"
+	_ "github.com/sfomuseum/go-http-protomaps"	
 	"github.com/aaronland/go-http-tangramjs"
 	"github.com/aaronland/go-http-maps/http"
 	"github.com/aaronland/go-http-maps/templates/html"
@@ -19,6 +20,8 @@ func main() {
 
 	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
 
+	map_renderer := fs.String("map-renderer", "", "...")
+	
 	nextzen_apikey := fs.String("nextzen-apikey", "", "A valid Nextzen API key")
 	nextzen_style_url := fs.String("nextzen-style-url", "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
 	nextzen_tile_url := fs.String("nextzen-tile-url", tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
@@ -69,6 +72,7 @@ func main() {
 
 	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
+		MapRenderer: *map_renderer,
 		InitialLatitude:  *initial_latitude,
 		InitialLongitude: *initial_longitude,
 		InitialZoom:      *initial_zoom,
@@ -83,13 +87,21 @@ func main() {
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
 	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
 
-	tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-	tangramjs_opts.Nextzen.APIKey = *nextzen_apikey
-	tangramjs_opts.Nextzen.StyleURL = *nextzen_style_url
-	tangramjs_opts.Nextzen.TileURL = *nextzen_tile_url
-
-	map_handler = tangramjs.AppendResourcesHandler(map_handler, tangramjs_opts)
-
+	switch *map_renderer {
+	case "protomap":
+		// pass
+	case "tangramjs":
+	
+		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
+		tangramjs_opts.Nextzen.APIKey = *nextzen_apikey
+		tangramjs_opts.Nextzen.StyleURL = *nextzen_style_url
+		tangramjs_opts.Nextzen.TileURL = *nextzen_tile_url
+		
+		map_handler = tangramjs.AppendResourcesHandler(map_handler, tangramjs_opts)
+	default:
+		// pass
+	}
+	
 	mux.Handle("/", map_handler)
 
 	//

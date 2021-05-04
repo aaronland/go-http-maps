@@ -11,12 +11,14 @@ type MapHandlerOptions struct {
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
+	MapRenderer string
 }
 
 type MapHandlerVars struct {
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
+	MapRenderer string	
 }
 
 func MapHandler(opts *MapHandlerOptions) (gohttp.Handler, error) {
@@ -30,6 +32,7 @@ func MapHandler(opts *MapHandlerOptions) (gohttp.Handler, error) {
 	fn := func(rsp gohttp.ResponseWriter, req *gohttp.Request) {
 
 		vars := MapHandlerVars{
+			MapRenderer: opts.MapRenderer,
 			InitialLatitude:  opts.InitialLatitude,
 			InitialLongitude: opts.InitialLongitude,
 			InitialZoom:      opts.InitialZoom,

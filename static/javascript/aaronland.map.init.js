@@ -25,19 +25,14 @@ window.addEventListener("load", function load(event){
 
     map.setView([init_lat, init_lon], init_zoom);
     
-    //
+    // https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html
+    // https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#l-draw
     
     var drawnItems = new L.FeatureGroup();
     
     map.addLayer(drawnItems);
     
     var drawControl = new L.Control.Draw({
-	draw: {
-                polyline: true,
-                polygon: true,
-                circle: false,
-                marker: true
-            },
         edit: {
             featureGroup: drawnItems
         }
@@ -45,23 +40,32 @@ window.addEventListener("load", function load(event){
     
     map.addControl(drawControl);
 
-    map.on(L.Draw.Event.CREATED, function (e) {
-            var type = e.layerType,
-                layer = e.layer;
+    map.on(L.Draw.Event.CREATED, function (e){
+        var type = e.layerType;
+        var layer = e.layer;
 
-            if (type === 'marker') {
-                layer.bindPopup('A popup!');
-            }
+	console.log("EDIT", type, layer);
+	
+        if (type === 'marker') {
+            layer.bindPopup('A popup!');
+        }
+	
+        drawnItems.addLayer(layer);
 
-            drawnItems.addLayer(layer);
+	console.log("GEOJSON", drawnItems.toGeoJSON());
+    });
+
+    map.on(L.Draw.Event.EDITED, function (e){
+        var layers = e.layers;
+	
+        var countOfEditedLayers = 0;
+	
+        layers.eachLayer(function(layer) {
+
+	    console.log("LAYER", layer);
+            countOfEditedLayers++;
         });
-
-        map.on(L.Draw.Event.EDITED, function (e) {
-            var layers = e.layers;
-            var countOfEditedLayers = 0;
-            layers.eachLayer(function(layer) {
-                countOfEditedLayers++;
-            });
-            console.log("Edited " + countOfEditedLayers + " layers");
-        });
+	
+        console.log("Edited " + countOfEditedLayers + " layers");
+    });
 });

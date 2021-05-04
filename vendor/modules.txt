@@ -27,6 +27,10 @@ github.com/aws/aws-lambda-go/lambdacontext
 # github.com/sfomuseum/go-flags v0.8.2
 ## explicit
 github.com/sfomuseum/go-flags/flagset
+# github.com/sfomuseum/go-http-protomaps v0.0.6
+## explicit
+github.com/sfomuseum/go-http-protomaps
+github.com/sfomuseum/go-http-protomaps/static
 # github.com/whosonfirst/algnhsa v0.1.0
 github.com/whosonfirst/algnhsa
 # golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
