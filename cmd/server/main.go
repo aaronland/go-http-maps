@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/aaronland/go-http-bootstrap"
+	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-maps/http"
 	"github.com/aaronland/go-http-maps/templates/html"
 	"github.com/aaronland/go-http-server"
@@ -16,6 +17,10 @@ import (
 
 func init() {
 
+	tangramjs.APPEND_LEAFLET_RESOURCES = false
+	tangramjs.APPEND_LEAFLET_ASSETS = false
+	protomaps.APPEND_LEAFLET_RESOURCES = false
+	protomaps.APPEND_LEAFLET_ASSETS = false
 }
 
 func main() {
@@ -70,6 +75,12 @@ func main() {
 		log.Fatalf("Failed to append static asset handlers, %v")
 	}
 
+	err = leaflet.AppendAssetHandlers(mux)
+
+	if err != nil {
+		log.Fatalf("Failed to append Leaflet asset handlers, %v", err)
+	}
+
 	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
 		MapRenderer:      *map_renderer,
@@ -86,6 +97,9 @@ func main() {
 
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
 	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
+
+	leaflet_opts := leaflet.DefaultLeafletOptions()
+	map_handler = leaflet.AppendResourcesHandler(map_handler, leaflet_opts)
 
 	switch *map_renderer {
 	case "protomaps":
