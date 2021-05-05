@@ -1,5 +1,14 @@
 window.addEventListener("load", function load(event){
 
+    var dump_geojson = function(fc) {
+
+	var enc_fc = JSON.stringify(fc, "", " ");
+
+	var pre = document.getElementById("geojson");
+	pre.innerHTML = "";
+	pre.appendChild(document.createTextNode(enc_fc));
+    };
+    
     var map_el = document.getElementById("map");
     var map = aaronland.maps.getMap(map_el);
 
@@ -39,31 +48,37 @@ window.addEventListener("load", function load(event){
     map.addControl(drawControl);
 
     map.on(L.Draw.Event.CREATED, function (e){
+	
         var type = e.layerType;
         var layer = e.layer;
 
-	console.log("EDIT", type, layer);
-	
         if (type === 'marker') {
             layer.bindPopup('A popup!');
         }
 	
         drawnItems.addLayer(layer);
 
-	console.log("GEOJSON", drawnItems.toGeoJSON());
+	var fc = drawnItems.toGeoJSON();
+	dump_geojson(fc);
     });
 
     map.on(L.Draw.Event.EDITED, function (e){
-        var layers = e.layers;
 	
-        var countOfEditedLayers = 0;
+	var fc = drawnItems.toGeoJSON();
+	dump_geojson(fc);
 	
-        layers.eachLayer(function(layer) {
-
-	    console.log("LAYER", layer);
-            countOfEditedLayers++;
-        });
-	
-        console.log("Edited " + countOfEditedLayers + " layers");
     });
+
+    map.on(L.Draw.Event.DELETED, function (e){
+
+        var type = e.layerType;
+        var layer = e.layer;
+
+        drawnItems.removeLayer(layer);
+	
+	var fc = drawnItems.toGeoJSON();
+	dump_geojson(fc);
+	
+    });
+    
 });
