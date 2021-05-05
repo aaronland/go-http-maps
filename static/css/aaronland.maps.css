@@ -3,3 +3,7 @@
 	height: 100vh;
 	border: solid thick;
 }
+
+.leaflet-draw-toolbar a {
+	background-size: 300px 30px !important;
+}
