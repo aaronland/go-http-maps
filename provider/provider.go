@@ -69,6 +69,12 @@ func AppendResourcesHandler(handler http.Handler, opts *MapOptions) http.Handler
 
 func AppendAssetHandlers(mux *http.ServeMux, opts *MapOptions) error {
 
+	err := leaflet.AppendAssetHandlers(mux)
+
+	if err != nil {
+		return err
+	}
+
 	switch opts.Provider {
 	case Protomaps:
 
