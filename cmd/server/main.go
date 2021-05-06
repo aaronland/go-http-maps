@@ -99,6 +99,8 @@ func main() {
 	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
 
 	leaflet_opts := leaflet.DefaultLeafletOptions()
+	leaflet_opts.EnableHash()
+	
 	map_handler = leaflet.AppendResourcesHandler(map_handler, leaflet_opts)
 
 	switch *map_renderer {
@@ -118,9 +120,9 @@ func main() {
 	case "tangramjs":
 
 		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-		tangramjs_opts.Nextzen.APIKey = *nextzen_apikey
-		tangramjs_opts.Nextzen.StyleURL = *nextzen_style_url
-		tangramjs_opts.Nextzen.TileURL = *nextzen_tile_url
+		tangramjs_opts.NextzenOptions.APIKey = *nextzen_apikey
+		tangramjs_opts.NextzenOptions.StyleURL = *nextzen_style_url
+		tangramjs_opts.NextzenOptions.TileURL = *nextzen_tile_url
 
 		map_handler = tangramjs.AppendResourcesHandler(map_handler, tangramjs_opts)
 
