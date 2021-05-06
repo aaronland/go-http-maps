@@ -100,7 +100,7 @@ func main() {
 
 	leaflet_opts := leaflet.DefaultLeafletOptions()
 	leaflet_opts.EnableHash()
-	
+
 	map_handler = leaflet.AppendResourcesHandler(map_handler, leaflet_opts)
 
 	switch *map_renderer {
