@@ -20,7 +20,7 @@ const (
 type MapOptions struct {
 	Provider         Provider
 	LeafletOptions   *leaflet.LeafletOptions
-	NextzenOptions   *tangramjs.NextzenOptions
+	TangramJSOptions *tangramjs.TangramJSOptions
 	ProtomapsOptions *protomaps.ProtomapsOptions
 }
 
@@ -34,6 +34,14 @@ func init() {
 func MapOptionsFromFlagSet(fs *flag.FlagSet) (*MapOptions, error) {
 
 	opts := &MapOptions{}
+
+	leaflet_opts := leaflet.DefaultLeafletOptions()
+	tangramjs_opts := tangramjs.DefaultTangramJSOptions()
+	pm_opts := protomaps.DefaultProtomapsOptions()
+
+	opts.LeafletOptions = leaflet_opts
+	opts.TangramJSOptions = tangramjs_opts
+	opts.ProtomapsOptions = pm_opts
 
 	return opts, nil
 }

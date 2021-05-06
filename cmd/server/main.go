@@ -3,37 +3,27 @@ package main
 import (
 	"context"
 	"github.com/aaronland/go-http-bootstrap"
-	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-maps/http"
+	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/templates/html"
 	"github.com/aaronland/go-http-server"
-	"github.com/aaronland/go-http-tangramjs"
 	"github.com/sfomuseum/go-flags/flagset"
-	"github.com/sfomuseum/go-http-protomaps"
 	"html/template"
 	"log"
 	gohttp "net/http"
 )
-
-func init() {
-
-	tangramjs.APPEND_LEAFLET_RESOURCES = false
-	tangramjs.APPEND_LEAFLET_ASSETS = false
-	protomaps.APPEND_LEAFLET_RESOURCES = false
-	protomaps.APPEND_LEAFLET_ASSETS = false
-}
 
 func main() {
 
 	fs := flagset.NewFlagSet("privatezen")
 
 	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
+	
+	fs.String("map-renderer", "", "Valid options are: protomaps, tangramjs")	// FIX
 
-	map_renderer := fs.String("map-renderer", "", "Valid options are: protomaps, tangramjs")
-
-	nextzen_apikey := fs.String("nextzen-apikey", "", "A valid Nextzen API key")
-	nextzen_style_url := fs.String("nextzen-style-url", "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
-	nextzen_tile_url := fs.String("nextzen-tile-url", tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
+	// nextzen_apikey := fs.String("nextzen-apikey", "", "A valid Nextzen API key")
+	// nextzen_style_url := fs.String("nextzen-style-url", "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
+	// nextzen_tile_url := fs.String("nextzen-tile-url", tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
 
 	initial_latitude := fs.Float64("initial-latitude", 37.61799, "A valid latitude for the map's initial view.")
 	initial_longitude := fs.Float64("initial-longitude", -122.370943, "A valid longitude for the map's initial view.")
@@ -61,6 +51,16 @@ func main() {
 		log.Fatalf("Failed to parse templates, %v", err)
 	}
 
+	provider_opts, err := provider.MapOptionsFromFlagSet(fs)
+
+	if err != nil {
+		log.Fatalf("Failed to create map options from flagset, %v", err)
+	}
+
+	provider_opts.Provider = provider.Protomaps                  // FIX
+	provider_opts.LeafletOptions.EnableHash()                    // FIX
+	provider_opts.ProtomapsOptions.TileURL = *protomaps_tile_url //FIX
+
 	mux := gohttp.NewServeMux()
 
 	err = bootstrap.AppendAssetHandlers(mux)
@@ -75,7 +75,7 @@ func main() {
 		log.Fatalf("Failed to append static asset handlers, %v")
 	}
 
-	err = leaflet.AppendAssetHandlers(mux)
+	err = provider.AppendAssetHandlers(mux, provider_opts)
 
 	if err != nil {
 		log.Fatalf("Failed to append Leaflet asset handlers, %v", err)
@@ -83,7 +83,7 @@ func main() {
 
 	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
-		MapRenderer:      *map_renderer,
+		MapRenderer:      "protomaps", // FIX
 		InitialLatitude:  *initial_latitude,
 		InitialLongitude: *initial_longitude,
 		InitialZoom:      *initial_zoom,
@@ -98,44 +98,7 @@ func main() {
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
 	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
 
-	leaflet_opts := leaflet.DefaultLeafletOptions()
-	leaflet_opts.EnableHash()
-
-	map_handler = leaflet.AppendResourcesHandler(map_handler, leaflet_opts)
-
-	switch *map_renderer {
-	case "protomaps":
-
-		pm_opts := protomaps.DefaultProtomapsOptions()
-		pm_opts.TileURL = *protomaps_tile_url
-
-		map_handler = protomaps.AppendResourcesHandler(map_handler, pm_opts)
-
-		err = protomaps.AppendAssetHandlers(mux)
-
-		if err != nil {
-			log.Fatalf("Failed to append Protomaps asset handlers, %v")
-		}
-
-	case "tangramjs":
-
-		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-		tangramjs_opts.NextzenOptions.APIKey = *nextzen_apikey
-		tangramjs_opts.NextzenOptions.StyleURL = *nextzen_style_url
-		tangramjs_opts.NextzenOptions.TileURL = *nextzen_tile_url
-
-		map_handler = tangramjs.AppendResourcesHandler(map_handler, tangramjs_opts)
-
-		err = tangramjs.AppendAssetHandlers(mux)
-
-		if err != nil {
-			log.Fatalf("Failed to append TangramJS asset handlers, %v")
-		}
-
-	default:
-		log.Fatalf("Invalid or unsupporter map renderer '%s'", *map_renderer)
-	}
-
+	map_handler = provider.AppendResourcesHandler(map_handler, provider_opts)
 	mux.Handle("/", map_handler)
 
 	//
