@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"flag"
 	"fmt"
 	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
@@ -9,19 +8,33 @@ import (
 	"net/http"
 )
 
-type Provider int
-
 const (
-	Unknown Provider = iota
-	TangramJS
-	Protomaps
+	UnknownProvider Provider = iota
+	TangramJSProvider
+	ProtomapsProvider
 )
 
-type MapOptions struct {
-	Provider         Provider
-	LeafletOptions   *leaflet.LeafletOptions
-	TangramJSOptions *tangramjs.TangramJSOptions
-	ProtomapsOptions *protomaps.ProtomapsOptions
+type Provider int
+
+func (p Provider) String() string {
+	switch p {
+	case TangramJSProvider:
+		return "tangramjs"
+	case ProtomapsProvider:
+		return "protomaps"
+	default:
+		return "unknown"
+	}
+}
+
+type ProviderOptions struct {
+	Provider          Provider
+	LeafletOptions    *leaflet.LeafletOptions
+	TangramJSOptions  *tangramjs.TangramJSOptions
+	ProtomapsOptions  *protomaps.ProtomapsOptions
+	IntitialLatitude  float64
+	IntitialLongitude float64
+	IntitialZoom      int
 }
 
 func init() {
@@ -31,31 +44,16 @@ func init() {
 	protomaps.APPEND_LEAFLET_ASSETS = false
 }
 
-func MapOptionsFromFlagSet(fs *flag.FlagSet) (*MapOptions, error) {
-
-	opts := &MapOptions{}
-
-	leaflet_opts := leaflet.DefaultLeafletOptions()
-	tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-	pm_opts := protomaps.DefaultProtomapsOptions()
-
-	opts.LeafletOptions = leaflet_opts
-	opts.TangramJSOptions = tangramjs_opts
-	opts.ProtomapsOptions = pm_opts
-
-	return opts, nil
-}
-
-func AppendResourcesHandler(handler http.Handler, opts *MapOptions) http.Handler {
+func AppendResourcesHandler(handler http.Handler, opts *ProviderOptions) http.Handler {
 
 	handler = leaflet.AppendResourcesHandler(handler, opts.LeafletOptions)
 
 	switch opts.Provider {
-	case Protomaps:
+	case ProtomapsProvider:
 
 		handler = protomaps.AppendResourcesHandler(handler, opts.ProtomapsOptions)
 
-	case TangramJS:
+	case TangramJSProvider:
 
 		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
 		handler = tangramjs.AppendResourcesHandler(handler, tangramjs_opts)
@@ -67,7 +65,7 @@ func AppendResourcesHandler(handler http.Handler, opts *MapOptions) http.Handler
 	return handler
 }
 
-func AppendAssetHandlers(mux *http.ServeMux, opts *MapOptions) error {
+func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
 
 	err := leaflet.AppendAssetHandlers(mux)
 
@@ -76,7 +74,7 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *MapOptions) error {
 	}
 
 	switch opts.Provider {
-	case Protomaps:
+	case ProtomapsProvider:
 
 		err := protomaps.AppendAssetHandlers(mux)
 
@@ -84,7 +82,7 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *MapOptions) error {
 			return err
 		}
 
-	case TangramJS:
+	case TangramJSProvider:
 
 		err := tangramjs.AppendAssetHandlers(mux)
 

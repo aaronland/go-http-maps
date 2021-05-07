@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"github.com/aaronland/go-http-maps/provider"
 	"html/template"
 	gohttp "net/http"
 )
@@ -11,14 +12,14 @@ type MapHandlerOptions struct {
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
-	MapRenderer      string
+	MapProvider      provider.Provider
 }
 
 type MapHandlerVars struct {
 	InitialLatitude  float64
 	InitialLongitude float64
 	InitialZoom      int
-	MapRenderer      string
+	MapProvider      string
 }
 
 func MapHandler(opts *MapHandlerOptions) (gohttp.Handler, error) {
@@ -32,7 +33,7 @@ func MapHandler(opts *MapHandlerOptions) (gohttp.Handler, error) {
 	fn := func(rsp gohttp.ResponseWriter, req *gohttp.Request) {
 
 		vars := MapHandlerVars{
-			MapRenderer:      opts.MapRenderer,
+			MapProvider:      opts.MapProvider.String(),
 			InitialLatitude:  opts.InitialLatitude,
 			InitialLongitude: opts.InitialLongitude,
 			InitialZoom:      opts.InitialZoom,

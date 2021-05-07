@@ -76,9 +76,9 @@ aaronland.maps = (function(){
 	    
 	    var map = L.map("map", map_args);
 
-	    var map_renderer = map_el.getAttribute("data-map-renderer");
+	    var map_provider = map_el.getAttribute("data-map-provider");
 	    
-	    if (map_renderer == "protomaps"){
+	    if (map_provider == "protomaps"){
 		
 		var pm_uri = document.body.getAttribute("data-protomaps-tile-url");		
 		var pm = new protomaps.PMTiles(pm_uri);
@@ -94,7 +94,7 @@ aaronland.maps = (function(){
 		});
 	    }
 
-	    if (map_renderer == "tangramjs"){
+	    if (map_provider == "tangramjs"){
 		
 		var tangram_opts = self.getTangramOptions();	   
 		var tangramLayer = Tangram.leafletLayer(tangram_opts);
@@ -102,7 +102,7 @@ aaronland.maps = (function(){
 		tangramLayer.addTo(map);
 	    }
 
-	    var attribution = self.getAttribution(map_renderer);
+	    var attribution = self.getAttribution(map_provider);
 	    map.attributionControl.addAttribution(attribution);
 	    
 	    maps[map_id] = map;
@@ -141,13 +141,13 @@ aaronland.maps = (function(){
 	    return tangram_opts;
 	},
 
-	'getAttribution': function(map_renderer){
+	'getAttribution': function(map_provider){
 
-	    if (map_renderer == "tangramjs"){
+	    if (map_provider == "tangramjs"){
 		return '<a href="https://github.com/tangrams" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> | <a href="https://www.nextzen.org/" target="_blank">Nextzen</a>';
 	    }
 
-	    if (map_renderer == "protomaps"){
+	    if (map_provider == "protomaps"){
 		return '<a href="https://github.com/protomaps" target="_blank">Protomaps</a> | <a href="http://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
 	    }
 	    

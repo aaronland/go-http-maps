@@ -1,5 +1,5 @@
 debug-tagram:
-	go run -mod vendor cmd/server/main.go -map-renderer tangramjs -nextzen-apikey $(APIKEY)
+	go run -mod vendor cmd/server/main.go -map-provider tangramjs -nextzen-apikey $(APIKEY)
 
 debug-protomaps:
-	go run -mod vendor cmd/server/main.go -map-renderer protomaps -protomaps-tile-url https://static.sfomuseum.org/pmtiles/sfo.pmtiles
+	go run -mod vendor cmd/server/main.go -map-provider protomaps -protomaps-tile-url https://static.sfomuseum.org/pmtiles/sfo.pmtiles

@@ -19,17 +19,15 @@ func main() {
 
 	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
 
-	fs.String("map-renderer", "", "Valid options are: protomaps, tangramjs") // FIX
-
-	// nextzen_apikey := fs.String("nextzen-apikey", "", "A valid Nextzen API key")
-	// nextzen_style_url := fs.String("nextzen-style-url", "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
-	// nextzen_tile_url := fs.String("nextzen-tile-url", tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
-
 	initial_latitude := fs.Float64("initial-latitude", 37.61799, "A valid latitude for the map's initial view.")
 	initial_longitude := fs.Float64("initial-longitude", -122.370943, "A valid longitude for the map's initial view.")
 	initial_zoom := fs.Int("initial-zoom", 15, "A valid zoom level for the map's initial view.")
 
-	protomaps_tile_url := fs.String("protomaps-tile-url", "", "A valid Protomaps .pmtiles URL for loading map tiles.")
+	err := provider.AppendProviderFlags(fs)
+
+	if err != nil {
+		log.Fatalf("Failed to append map provider flags, %v", err)
+	}
 
 	flagset.Parse(fs)
 
@@ -51,15 +49,11 @@ func main() {
 		log.Fatalf("Failed to parse templates, %v", err)
 	}
 
-	provider_opts, err := provider.MapOptionsFromFlagSet(fs)
+	provider_opts, err := provider.ProviderOptionsFromFlagSet(fs)
 
 	if err != nil {
 		log.Fatalf("Failed to create map options from flagset, %v", err)
 	}
-
-	provider_opts.Provider = provider.Protomaps                  // FIX
-	provider_opts.LeafletOptions.EnableHash()                    // FIX
-	provider_opts.ProtomapsOptions.TileURL = *protomaps_tile_url //FIX
 
 	mux := gohttp.NewServeMux()
 
@@ -83,7 +77,7 @@ func main() {
 
 	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
-		MapRenderer:      "protomaps", // FIX
+		MapProvider:      provider_opts.Provider,
 		InitialLatitude:  *initial_latitude,
 		InitialLongitude: *initial_longitude,
 		InitialZoom:      *initial_zoom,
