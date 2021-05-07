@@ -1,5 +1,28 @@
 window.addEventListener("load", function load(event){
 
+    // convert a set of draw layers to a geojson featurecollection
+    // and then ensure that any circle layers have their radius appended
+    // to the corresponding feature properties dictionary - hand
+    // of the featurecollection to the dump_geojson() method.
+    var export_layers = function(layers){
+
+	var fc = layers.toGeoJSON();	
+	var idx = 0;
+	
+        layers.eachLayer(function (layer) {
+
+	    if (layer._mRadius){
+		fc.features[idx].properties["radius"] = layer._mRadius;
+	    }
+	    
+	    idx += 1;
+	});
+	    
+	dump_geojson(fc);	
+    };
+
+    // stringify featurecollection (fc) and write it
+    // to a <pre> element.
     var dump_geojson = function(fc) {
 
 	var enc_fc = JSON.stringify(fc, "", " ");
@@ -57,15 +80,13 @@ window.addEventListener("load", function load(event){
         }
 	
         drawnItems.addLayer(layer);
+	export_layers(drawnItems);
 
-	var fc = drawnItems.toGeoJSON();
-	dump_geojson(fc);
     });
 
     map.on(L.Draw.Event.EDITED, function (e){
-	
-	var fc = drawnItems.toGeoJSON();
-	dump_geojson(fc);
+
+	export_layers(drawnItems);
 	
     });
 
@@ -75,9 +96,7 @@ window.addEventListener("load", function load(event){
         var layer = e.layer;
 
         drawnItems.removeLayer(layer);
-	
-	var fc = drawnItems.toGeoJSON();
-	dump_geojson(fc);
+	export_layers(drawnItems);
 	
     });
     
