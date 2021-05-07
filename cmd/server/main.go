@@ -5,17 +5,16 @@ import (
 	"github.com/aaronland/go-http-bootstrap"
 	"github.com/aaronland/go-http-maps/http"
 	"github.com/aaronland/go-http-maps/provider"
-	"github.com/aaronland/go-http-maps/templates/html"
+	"github.com/aaronland/go-http-maps/templates"
 	"github.com/aaronland/go-http-server"
 	"github.com/sfomuseum/go-flags/flagset"
-	"html/template"
 	"log"
 	gohttp "net/http"
 )
 
 func main() {
 
-	fs := flagset.NewFlagSet("privatezen")
+	fs := flagset.NewFlagSet("map")
 
 	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
 
@@ -39,11 +38,7 @@ func main() {
 		log.Fatalf("Failed to create new server for '%s', %v", *server_uri, err)
 	}
 
-	t := template.New("geotag").Funcs(template.FuncMap{
-		//
-	})
-
-	t, err = t.ParseFS(html.FS, "*.html")
+	t, err := templates.LoadHTMLTemplates()
 
 	if err != nil {
 		log.Fatalf("Failed to parse templates, %v", err)
