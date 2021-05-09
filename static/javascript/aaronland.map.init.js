@@ -25,6 +25,41 @@ window.addEventListener("load", function load(event){
     // to a <pre> element.
     var dump_geojson = function(fc) {
 
+	var count = fc.features.length;
+	var f;
+	
+	if (count == 1){
+	    f = fc.features[0];
+	} else {
+
+	    var geoms = [];
+
+	    for (var i=0; i < count; i++){
+		var f = fc.features[i];
+		geoms.push(f.geometry);
+	    }
+	    
+	    f = {
+		"Type": "Feature",
+		"geometry:": {
+		    "Type": "MultiGeometry", geometries: geoms
+		},
+		"properties": {}
+	    }
+	}
+	
+	f.properties["wof:id"] = 1;
+	f.properties["wof:name"] = "test";
+	f.properties["wof:placetype"] = "custom";	    
+	
+	var str_f = JSON.stringify(f);
+	
+	export_feature(str_f).then(f => {
+	    console.log("EXPORTED", f);
+	}).catch(err => {
+	    console.log("SAD", err)
+	});
+	
 	var enc_fc = JSON.stringify(fc, "", " ");
 
 	var pre = document.getElementById("geojson");
