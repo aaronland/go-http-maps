@@ -25,6 +25,7 @@ window.addEventListener("load", function load(event){
     // to a <pre> element.
     var dump_geojson = function(fc) {
 
+	// START OF wof-specific stuff
 	var count = fc.features.length;
 	var f;
 	
@@ -48,7 +49,7 @@ window.addEventListener("load", function load(event){
 	    }
 	}
 	
-	f.properties["wof:id"] = 1;
+	// f.properties["wof:id"] = 1;
 	f.properties["wof:name"] = "test";
 	f.properties["wof:placetype"] = "custom";	    
 	
@@ -59,6 +60,8 @@ window.addEventListener("load", function load(event){
 	}).catch(err => {
 	    console.log("SAD", err)
 	});
+
+	// END OF wof-specific stuff
 	
 	var enc_fc = JSON.stringify(fc, "", " ");
 
