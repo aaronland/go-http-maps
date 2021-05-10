@@ -11,16 +11,16 @@ import (
 	"strings"
 )
 
-// WASMOptions provides a list of JavaScript and CSS link to include with HTML output.
-type WASMOptions struct {
+// MapsOptions provides a list of JavaScript and CSS link to include with HTML output.
+type MapsOptions struct {
 	JS  []string
 	CSS []string
 }
 
-// Return a *WASMOptions struct with default paths and URIs.
-func DefaultWASMOptions() *WASMOptions {
+// Return a *MapsOptions struct with default paths and URIs.
+func DefaultMapsOptions() *MapsOptions {
 
-	opts := &WASMOptions{
+	opts := &MapsOptions{
 		CSS: []string{
 			"/css/aaronland.maps.css",
 		},
@@ -32,13 +32,13 @@ func DefaultWASMOptions() *WASMOptions {
 	return opts
 }
 
-// AppendResourcesHandler will rewrite any HTML produced by previous handler to include the necessary markup to load WASM JavaScript and CSS files and related assets.
-func AppendResourcesHandler(next gohttp.Handler, opts *WASMOptions) gohttp.Handler {
+// AppendResourcesHandler will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript and CSS files and related assets.
+func AppendResourcesHandler(next gohttp.Handler, opts *MapsOptions) gohttp.Handler {
 	return AppendResourcesHandlerWithPrefix(next, opts, "")
 }
 
-// AppendResourcesHandlerWithPrefix will rewrite any HTML produced by previous handler to include the necessary markup to load WASM JavaScript files and related assets ensuring that all URIs are prepended with a prefix.
-func AppendResourcesHandlerWithPrefix(next gohttp.Handler, opts *WASMOptions, prefix string) gohttp.Handler {
+// AppendResourcesHandlerWithPrefix will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript files and related assets ensuring that all URIs are prepended with a prefix.
+func AppendResourcesHandlerWithPrefix(next gohttp.Handler, opts *MapsOptions, prefix string) gohttp.Handler {
 
 	js := opts.JS
 	css := opts.CSS
@@ -62,14 +62,14 @@ func AppendResourcesHandlerWithPrefix(next gohttp.Handler, opts *WASMOptions, pr
 	return rewrite.AppendResourcesHandler(next, ext_opts)
 }
 
-// AssetsHandler returns a net/http FS instance containing the embedded WASM assets that are included with this package.
+// AssetsHandler returns a net/http FS instance containing the embedded Maps assets that are included with this package.
 func AssetsHandler() (gohttp.Handler, error) {
 
 	http_fs := gohttp.FS(static.FS)
 	return gohttp.FileServer(http_fs), nil
 }
 
-// AssetsHandler returns a net/http FS instance containing the embedded WASM assets that are included with this package ensuring that all URLs are stripped of prefix.
+// AssetsHandler returns a net/http FS instance containing the embedded Maps assets that are included with this package ensuring that all URLs are stripped of prefix.
 func AssetsHandlerWithPrefix(prefix string) (gohttp.Handler, error) {
 
 	fs_handler, err := AssetsHandler()
@@ -93,12 +93,12 @@ func AssetsHandlerWithPrefix(prefix string) (gohttp.Handler, error) {
 	return rewrite_handler, nil
 }
 
-// Append all the files in the net/http FS instance containing the embedded WASM assets to an *http.ServeMux instance.
+// Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance.
 func AppendAssetHandlers(mux *gohttp.ServeMux) error {
 	return AppendAssetHandlersWithPrefix(mux, "")
 }
 
-// Append all the files in the net/http FS instance containing the embedded WASM assets to an *http.ServeMux instance ensuring that all URLs are prepended with prefix.
+// Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance ensuring that all URLs are prepended with prefix.
 func AppendAssetHandlersWithPrefix(mux *gohttp.ServeMux, prefix string) error {
 
 	asset_handler, err := AssetsHandlerWithPrefix(prefix)
