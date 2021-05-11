@@ -38,6 +38,8 @@ github.com/sfomuseum/go-http-protomaps v0.0.8 h1:l7jnjOqayui+TpuXtvWyiPOl+O2Bmnu
 github.com/sfomuseum/go-http-protomaps v0.0.8/go.mod h1:t7KchyG5HUjtmEn73YjWkWgf9VwS8ZqvMPE6cC14tlc=
 github.com/sfomuseum/go-http-protomaps v0.0.9 h1:4oB4u1B7tT8n/mW9JRM07tt2r/jCcPC6ri2cPscFwNE=
 github.com/sfomuseum/go-http-protomaps v0.0.9/go.mod h1:jMeHqPpNoO30nMX3PaHuI2D+n2vXQScUZ3v9SeRv0/I=
+github.com/sfomuseum/go-http-protomaps v0.0.10 h1:hKt3GvoyOxAPc7rHxzZSMVEB8yZu2jeqYEFHek5uW04=
+github.com/sfomuseum/go-http-protomaps v0.0.10/go.mod h1:jMeHqPpNoO30nMX3PaHuI2D+n2vXQScUZ3v9SeRv0/I=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/whosonfirst/algnhsa v0.1.0 h1:8wVksKaz1qor2Y6+fiLEPEPxsEEvUQgSdtSTQLMrnlA=
