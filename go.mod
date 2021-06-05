@@ -10,4 +10,5 @@ require (
 	github.com/aaronland/go-http-tangramjs v0.1.0
 	github.com/sfomuseum/go-flags v0.8.2
 	github.com/sfomuseum/go-http-protomaps v0.0.10
+	github.com/tilezen/go-tilepacks v0.0.0-20210602151652-0147f7fb6fd7
 )

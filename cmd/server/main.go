@@ -18,10 +18,6 @@ func main() {
 
 	server_uri := fs.String("server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
 
-	initial_latitude := fs.Float64("initial-latitude", 37.61799, "A valid latitude for the map's initial view.")
-	initial_longitude := fs.Float64("initial-longitude", -122.370943, "A valid longitude for the map's initial view.")
-	initial_zoom := fs.Int("initial-zoom", 15, "A valid zoom level for the map's initial view.")
-
 	err := provider.AppendProviderFlags(fs)
 
 	if err != nil {
@@ -73,9 +69,9 @@ func main() {
 	map_opts := &http.MapHandlerOptions{
 		Templates:        t,
 		MapProvider:      provider_opts.Provider,
-		InitialLatitude:  *initial_latitude,
-		InitialLongitude: *initial_longitude,
-		InitialZoom:      *initial_zoom,
+		InitialLatitude:  provider_opts.InitialLatitude,
+		InitialLongitude: provider_opts.InitialLongitude,
+		InitialZoom:      provider_opts.InitialZoom,
 	}
 
 	map_handler, err := http.MapHandler(map_opts)

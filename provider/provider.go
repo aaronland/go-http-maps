@@ -5,6 +5,8 @@ import (
 	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
 	"github.com/sfomuseum/go-http-protomaps"
+	tilepack_http "github.com/tilezen/go-tilepacks/http"
+	"github.com/tilezen/go-tilepacks/tilepack"
 	"net/http"
 )
 
@@ -28,13 +30,16 @@ func (p Provider) String() string {
 }
 
 type ProviderOptions struct {
-	Provider          Provider
-	LeafletOptions    *leaflet.LeafletOptions
-	TangramJSOptions  *tangramjs.TangramJSOptions
-	ProtomapsOptions  *protomaps.ProtomapsOptions
-	IntitialLatitude  float64
-	IntitialLongitude float64
-	IntitialZoom      int
+	Provider              Provider
+	LeafletOptions        *leaflet.LeafletOptions
+	TangramJSOptions      *tangramjs.TangramJSOptions
+	ProtomapsOptions      *protomaps.ProtomapsOptions
+	TilezenEnableTilepack bool
+	TilezenTilepackPath   string
+	TilezenTilepackURL    string
+	InitialLatitude       float64
+	InitialLongitude      float64
+	InitialZoom           int
 }
 
 func init() {
@@ -89,6 +94,19 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
 		if err != nil {
 			return err
 		}
+
+		if opts.TilezenEnableTilepack {
+
+			tilepack_reader, err := tilepack.NewMbtilesReader(opts.TilezenTilepackPath)
+
+			if err != nil {
+				return fmt.Errorf("Failed to create tilepack reader, %w", err)
+			}
+
+			tilepack_handler := tilepack_http.MbtilesHandler(tilepack_reader)
+			mux.Handle(opts.TilezenTilepackPath, tilepack_handler)
+		}
+
 	default:
 		return fmt.Errorf("Invalid or unsupporter map provider '%v'", opts.Provider)
 	}
