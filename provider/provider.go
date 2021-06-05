@@ -8,6 +8,7 @@ import (
 	tilepack_http "github.com/tilezen/go-tilepacks/http"
 	"github.com/tilezen/go-tilepacks/tilepack"
 	"net/http"
+	"log"
 )
 
 const (
@@ -60,8 +61,7 @@ func AppendResourcesHandler(handler http.Handler, opts *ProviderOptions) http.Ha
 
 	case TangramJSProvider:
 
-		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-		handler = tangramjs.AppendResourcesHandler(handler, tangramjs_opts)
+		handler = tangramjs.AppendResourcesHandler(handler, opts.TangramJSOptions)
 
 	default:
 		// pass
@@ -97,6 +97,8 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
 
 		if opts.TilezenEnableTilepack {
 
+			log.Println("OK", opts.TilezenTilepackPath)
+			
 			tilepack_reader, err := tilepack.NewMbtilesReader(opts.TilezenTilepackPath)
 
 			if err != nil {
@@ -104,7 +106,7 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
 			}
 
 			tilepack_handler := tilepack_http.MbtilesHandler(tilepack_reader)
-			mux.Handle(opts.TilezenTilepackPath, tilepack_handler)
+			mux.Handle(opts.TilezenTilepackURL, tilepack_handler)
 		}
 
 	default:

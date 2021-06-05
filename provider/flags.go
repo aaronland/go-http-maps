@@ -7,6 +7,7 @@ import (
 	"github.com/aaronland/go-http-tangramjs"
 	"github.com/sfomuseum/go-http-protomaps"
 	"strings"
+	_ "log"
 )
 
 const MapProviderFlag string = "map-provider"
@@ -78,8 +79,8 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 	fs.BoolVar(&tilezen_enable_tilepack, TilezenEnableTilepack, false, "Enable to use of Tilezen MBTiles tilepack for tile-serving.")
 	fs.StringVar(&tilezen_tilepack_path, TilezenTilepackPath, "", "The path to the Tilezen MBTiles tilepack to use for serving tiles.")
 
-	fs.Float64Var(&initial_latitude, InitialLatitude, 37.61799, "A valid latitude for the map's initial view.")
-	fs.Float64Var(&initial_longitude, InitialLongitude, -122.5, "A valid longitude for the map's initial view.")
+	fs.Float64Var(&initial_latitude, InitialLatitude, 37.7780, "A valid latitude for the map's initial view.")
+	fs.Float64Var(&initial_longitude, InitialLongitude, -122.4316, "A valid longitude for the map's initial view.")
 	fs.IntVar(&initial_zoom, InitialZoom, 15, "A valid zoom level for the map's initial view.")
 
 	return nil
@@ -124,7 +125,7 @@ func ProviderOptionsFromFlagSet(fs *flag.FlagSet) (*ProviderOptions, error) {
 		tangramjs_opts.NextzenOptions.APIKey = nextzen_apikey
 		tangramjs_opts.NextzenOptions.StyleURL = nextzen_style_url
 		tangramjs_opts.NextzenOptions.TileURL = nextzen_tile_url
-
+		
 		opts.TangramJSOptions = tangramjs_opts
 		opts.Provider = TangramJSProvider
 
