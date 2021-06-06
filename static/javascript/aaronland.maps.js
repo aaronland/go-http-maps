@@ -95,6 +95,8 @@ aaronland.maps = (function(){
 	    }
 
 	    if (map_provider == "tangramjs"){
+
+		map.setMaxZoom(17.99);	// TO DO: make this Z20 or something...
 		
 		var tangram_opts = self.getTangramOptions();	   
 		var tangramLayer = Tangram.leafletLayer(tangram_opts);

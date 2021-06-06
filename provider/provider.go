@@ -7,8 +7,8 @@ import (
 	"github.com/sfomuseum/go-http-protomaps"
 	tilepack_http "github.com/tilezen/go-tilepacks/http"
 	"github.com/tilezen/go-tilepacks/tilepack"
+	_ "log"
 	"net/http"
-	"log"
 )
 
 const (
@@ -97,8 +97,6 @@ func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
 
 		if opts.TilezenEnableTilepack {
 
-			log.Println("OK", opts.TilezenTilepackPath)
-			
 			tilepack_reader, err := tilepack.NewMbtilesReader(opts.TilezenTilepackPath)
 
 			if err != nil {
