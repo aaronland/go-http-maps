@@ -49,18 +49,12 @@ window.addEventListener("load", function load(event){
 	    }
 	}
 	
-	// f.properties["wof:id"] = 1;
+	f.properties["wof:id"] = -1;
 	f.properties["wof:name"] = "test";
 	f.properties["wof:placetype"] = "custom";	    
 	
 	var str_f = JSON.stringify(f);
 	
-	export_feature(str_f).then(f => {
-	    console.log("EXPORTED", f);
-	}).catch(err => {
-	    console.log("SAD", err)
-	});
-
 	// END OF wof-specific stuff
 	
 	var enc_fc = JSON.stringify(fc, "", " ");
