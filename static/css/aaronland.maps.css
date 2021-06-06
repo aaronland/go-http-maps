@@ -16,6 +16,7 @@
 	height: 100vh;
 }
 
+/* This is necessary to account for "drift" in the spritesheet, at in Firefox */
 .leaflet-draw-toolbar a {
 	background-size: 300px 30px !important;
 }

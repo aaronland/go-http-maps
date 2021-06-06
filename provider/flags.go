@@ -6,6 +6,7 @@ import (
 	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
 	"github.com/sfomuseum/go-http-protomaps"
+	_ "log"
 	"strings"
 )
 
@@ -41,6 +42,26 @@ const ProtomapsTileURLFlag string = "protomaps-tile-url"
 
 var protomaps_tile_url string
 
+const TilezenEnableTilepack string = "tilezen-enable-tilepack"
+
+var tilezen_enable_tilepack bool
+
+const TilezenTilepackPath string = "tilezen-tilepack-path"
+
+var tilezen_tilepack_path string
+
+const InitialLatitude string = "initial-latitude"
+
+var initial_latitude float64
+
+const InitialLongitude string = "initial-longitude"
+
+var initial_longitude float64
+
+const InitialZoom string = "initial-zoom"
+
+var initial_zoom int
+
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.StringVar(&map_provider, MapProviderFlag, "", "...")
@@ -55,17 +76,23 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "", "A valid Protomaps .pmtiles URL for loading map tiles.")
 
-	//TBD
-	//initial_latitude := fs.Float64("initial-latitude", 37.61799, "A valid latitude for the map's initial view.")
-	//initial_longitude := fs.Float64("initial-longitude", -122.370943, "A valid longitude for the map's initial view.")
-	//initial_zoom := fs.Int("initial-zoom", 15, "A valid zoom level for the map's initial view.")
+	fs.BoolVar(&tilezen_enable_tilepack, TilezenEnableTilepack, false, "Enable to use of Tilezen MBTiles tilepack for tile-serving.")
+	fs.StringVar(&tilezen_tilepack_path, TilezenTilepackPath, "", "The path to the Tilezen MBTiles tilepack to use for serving tiles.")
+
+	fs.Float64Var(&initial_latitude, InitialLatitude, 37.778008, "A valid latitude for the map's initial view.")
+	fs.Float64Var(&initial_longitude, InitialLongitude, -122.431272, "A valid longitude for the map's initial view.")
+	fs.IntVar(&initial_zoom, InitialZoom, 15, "A valid zoom level for the map's initial view.")
 
 	return nil
 }
 
 func ProviderOptionsFromFlagSet(fs *flag.FlagSet) (*ProviderOptions, error) {
 
-	opts := &ProviderOptions{}
+	opts := &ProviderOptions{
+		InitialLatitude:  initial_latitude,
+		InitialLongitude: initial_longitude,
+		InitialZoom:      initial_zoom,
+	}
 
 	leaflet_opts := leaflet.DefaultLeafletOptions()
 
@@ -104,6 +131,16 @@ func ProviderOptionsFromFlagSet(fs *flag.FlagSet) (*ProviderOptions, error) {
 
 	default:
 		return nil, fmt.Errorf("Unknown or unsupported map provider '%s'", map_provider)
+	}
+
+	if tilezen_enable_tilepack {
+		opts.TilezenEnableTilepack = true
+		opts.TilezenTilepackPath = tilezen_tilepack_path
+		opts.TilezenTilepackURL = "/tilezen/"
+
+		if strings.ToLower(map_provider) == "tangramjs" {
+			opts.TangramJSOptions.NextzenOptions.TileURL = "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt"
+		}
 	}
 
 	return opts, nil
