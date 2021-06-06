@@ -21,6 +21,7 @@ go run -mod vendor cmd/server/main.go \
 
 ## See also
 
+* https://github.com/aaronland/go-http-leaflet
 * https://github.com/aaronland/go-http-tangramjs
 * https://github.com/aaronland/go-http-protomaps
 * https://github.com/tilezen/go-tilepacks
