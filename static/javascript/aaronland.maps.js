@@ -74,7 +74,7 @@ aaronland.maps = (function(){
 
 	    var map_args = {};
 	    
-	    var map = L.map("map", map_args);
+	    var map = L.map(map_id, map_args);
 
 	    var map_provider = map_el.getAttribute("data-map-provider");
 	    
