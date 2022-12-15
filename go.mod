@@ -15,6 +15,7 @@ require (
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.0.3
 	github.com/sfomuseum/go-template v1.2.1
 	github.com/tilezen/go-tilepacks v0.0.0-20220729022432-5ee633f5bb6a
+	gocloud.dev v0.27.0
 )
 
 require (
@@ -39,7 +40,6 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/schollz/progressbar/v3 v3.11.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	gocloud.dev v0.27.0 // indirect
 	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect

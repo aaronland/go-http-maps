@@ -1,6 +1,10 @@
 package provider
 
 import (
+	_ "gocloud.dev/blob/fileblob"
+)
+
+import (
 	"context"
 	"fmt"
 	"github.com/aaronland/go-http-leaflet"
@@ -105,6 +109,7 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		p.cache_size = sz
 		p.bucket_uri = q_bucket_uri
 		p.database = q_database
+		p.path_tiles = q_tile_url
 		p.serve_tiles = true
 	}
 
@@ -150,6 +155,7 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 		strip_path := strings.TrimRight(p.path_tiles, "/")
 		pmtiles_handler = http.StripPrefix(strip_path, pmtiles_handler)
 
+		log.Println("ADD", p.path_tiles)
 		mux.Handle(p.path_tiles, pmtiles_handler)
 
 		// Because inevitably I will forget...

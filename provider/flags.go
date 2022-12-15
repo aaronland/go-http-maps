@@ -6,6 +6,7 @@ import (
 	"github.com/aaronland/go-http-tangramjs"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 const MapProviderFlag string = "map-provider"
@@ -66,7 +67,17 @@ var protomaps_database string
 
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
-	fs.StringVar(&map_provider, MapProviderFlag, "", "...")
+	schemes := Schemes()
+	labels := make([]string, len(schemes))
+
+	for idx, s := range schemes {
+		labels[idx] = strings.Replace(s, "://", "", 1)
+	}
+
+	str_schemes := strings.Join(labels, ", ")
+	map_provider_desc := fmt.Sprintf("Valid options are: %s", str_schemes)
+
+	fs.StringVar(&map_provider, MapProviderFlag, "", map_provider_desc)
 
 	err := AppendLeafletFlags(fs)
 
@@ -112,7 +123,7 @@ func AppendTangramProviderFlags(fs *flag.FlagSet) error {
 
 func AppendProtomapsProviderFlags(fs *flag.FlagSet) error {
 
-	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "", "A valid Protomaps .pmtiles URL for loading map tiles.")
+	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "/tiles/", "A valid Protomaps .pmtiles URL for loading map tiles.")
 
 	fs.BoolVar(&protomaps_serve_tiles, ProtomapsServeTilesFlag, false, "A boolean flag signaling whether to serve Protomaps tiles locally.")
 	fs.IntVar(&protomaps_cache_size, ProtomapsCacheSizeFlag, 64, "The size of the internal Protomaps cache if serving tiles locally.")
