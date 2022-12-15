@@ -121,14 +121,22 @@ func (p *ProtomapsProvider) Scheme() string {
 }
 
 func (p *ProtomapsProvider) AppendResourcesHandler(handler http.Handler) http.Handler {
-	handler = leaflet.AppendResourcesHandler(handler, p.leafletOptions)
-	handler = protomaps.AppendResourcesHandler(handler, p.protomapsOptions)
+	return p.AppendResourcesHandlerWithPrefix(handler, "")
+}
+
+func (p *ProtomapsProvider) AppendResourcesHandlerWithPrefix(handler http.Handler, prefix string) http.Handler {
+	handler = leaflet.AppendResourcesHandlerWithPrefix(handler, p.leafletOptions, prefix)
+	handler = protomaps.AppendResourcesHandlerWithPrefix(handler, p.protomapsOptions, prefix)
 	return handler
 }
 
 func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
+	return p.AppendAssetHandlersWithPrefix(mux, "")
+}
 
-	err := leaflet.AppendAssetHandlers(mux)
+func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, prefix string) error {
+
+	err := leaflet.AppendAssetHandlersWithPrefix(mux, prefix)
 
 	if err != nil {
 		return fmt.Errorf("Failed to append leaflet asset handler, %w", err)
@@ -139,6 +147,8 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 	if err != nil {
 		return fmt.Errorf("Failed to append protomaps asset handler, %w", err)
 	}
+
+	// to do: prefix stuff...
 
 	if p.serve_tiles {
 
@@ -155,7 +165,6 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 		strip_path := strings.TrimRight(p.path_tiles, "/")
 		pmtiles_handler = http.StripPrefix(strip_path, pmtiles_handler)
 
-		log.Println("ADD", p.path_tiles)
 		mux.Handle(p.path_tiles, pmtiles_handler)
 
 		// Because inevitably I will forget...
