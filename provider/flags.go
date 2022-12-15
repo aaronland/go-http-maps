@@ -2,12 +2,9 @@ package provider
 
 import (
 	"flag"
-	"fmt"
-	_ "github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
-	_ "github.com/sfomuseum/go-http-protomaps"
-	_ "log"
-	_ "strings"
+	"net/url"
+	"strconv"
 )
 
 const MapProviderFlag string = "map-provider"
@@ -50,18 +47,6 @@ const TilezenTilepackPath string = "tilezen-tilepack-path"
 
 var tilezen_tilepack_path string
 
-const InitialLatitude string = "initial-latitude"
-
-var initial_latitude float64
-
-const InitialLongitude string = "initial-longitude"
-
-var initial_longitude float64
-
-const InitialZoom string = "initial-zoom"
-
-var initial_zoom int
-
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.StringVar(&map_provider, MapProviderFlag, "", "...")
@@ -79,73 +64,59 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 	fs.BoolVar(&tilezen_enable_tilepack, TilezenEnableTilepack, false, "Enable to use of Tilezen MBTiles tilepack for tile-serving.")
 	fs.StringVar(&tilezen_tilepack_path, TilezenTilepackPath, "", "The path to the Tilezen MBTiles tilepack to use for serving tiles.")
 
-	fs.Float64Var(&initial_latitude, InitialLatitude, 37.778008, "A valid latitude for the map's initial view.")
-	fs.Float64Var(&initial_longitude, InitialLongitude, -122.431272, "A valid longitude for the map's initial view.")
-	fs.IntVar(&initial_zoom, InitialZoom, 15, "A valid zoom level for the map's initial view.")
-
 	return nil
 }
 
 func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 
-	return "", fmt.Errorf("Not implemented")
+	u := url.URL{}
+	u.Scheme = map_provider
 
-	/*
-		opts := &ProviderOptions{
-			InitialLatitude:  initial_latitude,
-			InitialLongitude: initial_longitude,
-			InitialZoom:      initial_zoom,
+	q := url.Values{}
+
+	if leaflet_enable_hash {
+		q.Set("leaflet-enable-hash", strconv.FormatBool(leaflet_enable_hash))
+	}
+
+	if leaflet_enable_fullscreen {
+		q.Set("leaflet-enable-fullscreen", strconv.FormatBool(leaflet_enable_fullscreen))
+	}
+
+	if leaflet_enable_draw {
+		q.Set("leaflet-enable-draw", strconv.FormatBool(leaflet_enable_draw))
+	}
+
+	switch map_provider {
+	case "protomaps":
+
+		q.Set("tile-url", protomaps_tile_url)
+
+	case "nextzen":
+
+		q.Set("nextzen-apikey", nextzen_apikey)
+
+		if nextzen_style_url != "" {
+			q.Set("nextzen-style-url", nextzen_style_url)
 		}
 
-		leaflet_opts := leaflet.DefaultLeafletOptions()
-
-		if leaflet_enable_hash {
-			leaflet_opts.EnableHash()
-		}
-
-		if leaflet_enable_fullscreen {
-			leaflet_opts.EnableFullscreen()
-		}
-
-		if leaflet_enable_draw {
-			leaflet_opts.EnableDraw()
-		}
-
-		opts.LeafletOptions = leaflet_opts
-
-		switch strings.ToLower(map_provider) {
-		case "protomaps":
-
-			pm_opts := protomaps.DefaultProtomapsOptions()
-			pm_opts.TileURL = protomaps_tile_url
-
-			opts.ProtomapsOptions = pm_opts
-			opts.Provider = ProtomapsProvider
-
-		case "tangramjs":
-
-			tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-			tangramjs_opts.NextzenOptions.APIKey = nextzen_apikey
-			tangramjs_opts.NextzenOptions.StyleURL = nextzen_style_url
-			tangramjs_opts.NextzenOptions.TileURL = nextzen_tile_url
-
-			opts.TangramJSOptions = tangramjs_opts
-			opts.Provider = TangramJSProvider
-
-		default:
-			return nil, fmt.Errorf("Unknown or unsupported map provider '%s'", map_provider)
+		if nextzen_tile_url != "" {
+			q.Set("nextzen-tile-url", nextzen_tile_url)
 		}
 
 		if tilezen_enable_tilepack {
-			opts.TilezenEnableTilepack = true
-			opts.TilezenTilepackPath = tilezen_tilepack_path
-			opts.TilezenTilepackURL = "/tilezen/"
 
-			if strings.ToLower(map_provider) == "tangramjs" {
-				opts.TangramJSOptions.NextzenOptions.TileURL = "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt"
-			}
+			q.Set("tilezen-enable-tilepack", strconv.FormatBool(tilezen_enable_tilepack))
+			q.Set("tilezen-tilepack-path", tilezen_tilepack_path)
+			q.Set("tilezen-tilepack-url", "/tilezen/")
+
+			q.Del("nextzen-tile-url")
+			q.Set("nextzen-tile-url", "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt")
 		}
 
-		return opts, nil
-	*/
+	default:
+		// pass
+	}
+
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }
