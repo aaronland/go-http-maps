@@ -3,11 +3,11 @@ package provider
 import (
 	"flag"
 	"fmt"
-	"github.com/aaronland/go-http-leaflet"
+	_ "github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
-	"github.com/sfomuseum/go-http-protomaps"
+	_ "github.com/sfomuseum/go-http-protomaps"
 	_ "log"
-	"strings"
+	_ "strings"
 )
 
 const MapProviderFlag string = "map-provider"
@@ -86,62 +86,66 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 	return nil
 }
 
-func ProviderOptionsFromFlagSet(fs *flag.FlagSet) (*ProviderOptions, error) {
+func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 
-	opts := &ProviderOptions{
-		InitialLatitude:  initial_latitude,
-		InitialLongitude: initial_longitude,
-		InitialZoom:      initial_zoom,
-	}
+	return "", fmt.Errorf("Not implemented")
 
-	leaflet_opts := leaflet.DefaultLeafletOptions()
-
-	if leaflet_enable_hash {
-		leaflet_opts.EnableHash()
-	}
-
-	if leaflet_enable_fullscreen {
-		leaflet_opts.EnableFullscreen()
-	}
-
-	if leaflet_enable_draw {
-		leaflet_opts.EnableDraw()
-	}
-
-	opts.LeafletOptions = leaflet_opts
-
-	switch strings.ToLower(map_provider) {
-	case "protomaps":
-
-		pm_opts := protomaps.DefaultProtomapsOptions()
-		pm_opts.TileURL = protomaps_tile_url
-
-		opts.ProtomapsOptions = pm_opts
-		opts.Provider = ProtomapsProvider
-
-	case "tangramjs":
-
-		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-		tangramjs_opts.NextzenOptions.APIKey = nextzen_apikey
-		tangramjs_opts.NextzenOptions.StyleURL = nextzen_style_url
-		tangramjs_opts.NextzenOptions.TileURL = nextzen_tile_url
-
-		opts.TangramJSOptions = tangramjs_opts
-		opts.Provider = TangramJSProvider
-
-	default:
-		return nil, fmt.Errorf("Unknown or unsupported map provider '%s'", map_provider)
-	}
-
-	if tilezen_enable_tilepack {
-		opts.TilezenEnableTilepack = true
-		opts.TilezenTilepackPath = tilezen_tilepack_path
-		opts.TilezenTilepackURL = "/tilezen/"
-
-		if strings.ToLower(map_provider) == "tangramjs" {
-			opts.TangramJSOptions.NextzenOptions.TileURL = "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt"
+	/*
+		opts := &ProviderOptions{
+			InitialLatitude:  initial_latitude,
+			InitialLongitude: initial_longitude,
+			InitialZoom:      initial_zoom,
 		}
-	}
 
-	return opts, nil
+		leaflet_opts := leaflet.DefaultLeafletOptions()
+
+		if leaflet_enable_hash {
+			leaflet_opts.EnableHash()
+		}
+
+		if leaflet_enable_fullscreen {
+			leaflet_opts.EnableFullscreen()
+		}
+
+		if leaflet_enable_draw {
+			leaflet_opts.EnableDraw()
+		}
+
+		opts.LeafletOptions = leaflet_opts
+
+		switch strings.ToLower(map_provider) {
+		case "protomaps":
+
+			pm_opts := protomaps.DefaultProtomapsOptions()
+			pm_opts.TileURL = protomaps_tile_url
+
+			opts.ProtomapsOptions = pm_opts
+			opts.Provider = ProtomapsProvider
+
+		case "tangramjs":
+
+			tangramjs_opts := tangramjs.DefaultTangramJSOptions()
+			tangramjs_opts.NextzenOptions.APIKey = nextzen_apikey
+			tangramjs_opts.NextzenOptions.StyleURL = nextzen_style_url
+			tangramjs_opts.NextzenOptions.TileURL = nextzen_tile_url
+
+			opts.TangramJSOptions = tangramjs_opts
+			opts.Provider = TangramJSProvider
+
+		default:
+			return nil, fmt.Errorf("Unknown or unsupported map provider '%s'", map_provider)
+		}
+
+		if tilezen_enable_tilepack {
+			opts.TilezenEnableTilepack = true
+			opts.TilezenTilepackPath = tilezen_tilepack_path
+			opts.TilezenTilepackURL = "/tilezen/"
+
+			if strings.ToLower(map_provider) == "tangramjs" {
+				opts.TangramJSOptions.NextzenOptions.TileURL = "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt"
+			}
+		}
+
+		return opts, nil
+	*/
 }
