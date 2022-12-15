@@ -3,10 +3,9 @@ package provider
 import (
 	"flag"
 	"fmt"
-	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-tangramjs"
-	"github.com/sfomuseum/go-http-protomaps"
-	_ "log"
+	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -50,98 +49,148 @@ const TilezenTilepackPath string = "tilezen-tilepack-path"
 
 var tilezen_tilepack_path string
 
-const InitialLatitude string = "initial-latitude"
+const ProtomapsServeTilesFlag string = "protomaps-serve-tiles"
 
-var initial_latitude float64
+var protomaps_serve_tiles bool
 
-const InitialLongitude string = "initial-longitude"
+const ProtomapsCacheSizeFlag string = "protomaps-caches-size"
 
-var initial_longitude float64
+var protomaps_cache_size int
 
-const InitialZoom string = "initial-zoom"
+const ProtomapsBucketURIFlag string = "protomaps-bucket-uri"
 
-var initial_zoom int
+var protomaps_bucket_uri string
+
+const ProtomapsDatabaseFlag string = "protomaps-database"
+
+var protomaps_database string
 
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
-	fs.StringVar(&map_provider, MapProviderFlag, "", "...")
+	schemes := Schemes()
+	labels := make([]string, len(schemes))
+
+	for idx, s := range schemes {
+		labels[idx] = strings.Replace(s, "://", "", 1)
+	}
+
+	str_schemes := strings.Join(labels, ", ")
+	map_provider_desc := fmt.Sprintf("Valid options are: %s", str_schemes)
+
+	fs.StringVar(&map_provider, MapProviderFlag, "", map_provider_desc)
+
+	err := AppendLeafletFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append Leaflet flags, %w", err)
+	}
+
+	err = AppendTangramProviderFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append TangramJS flags, %w", err)
+	}
+
+	err = AppendProtomapsProviderFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append Protomaps flags, %w", err)
+	}
+
+	return nil
+}
+
+func AppendLeafletFlags(fs *flag.FlagSet) error {
 
 	fs.BoolVar(&leaflet_enable_hash, LeafletEnableHashFlag, true, "Enable the Leaflet.Hash plugin.")
 	fs.BoolVar(&leaflet_enable_fullscreen, LeafletEnableFullscreenFlag, false, "Enable the Leaflet.Fullscreen plugin.")
 	fs.BoolVar(&leaflet_enable_draw, LeafletEnableDrawFlag, false, "Enable the Leaflet.Draw plugin.")
 
+	return nil
+}
+
+func AppendTangramProviderFlags(fs *flag.FlagSet) error {
+
 	fs.StringVar(&nextzen_apikey, NextzenAPIKeyFlag, "", "A valid Nextzen API key")
 	fs.StringVar(&nextzen_style_url, NextzenStyleURLFlag, "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
 	fs.StringVar(&nextzen_tile_url, NextzenTileURLFlag, tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
 
-	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "", "A valid Protomaps .pmtiles URL for loading map tiles.")
-
 	fs.BoolVar(&tilezen_enable_tilepack, TilezenEnableTilepack, false, "Enable to use of Tilezen MBTiles tilepack for tile-serving.")
 	fs.StringVar(&tilezen_tilepack_path, TilezenTilepackPath, "", "The path to the Tilezen MBTiles tilepack to use for serving tiles.")
-
-	fs.Float64Var(&initial_latitude, InitialLatitude, 37.778008, "A valid latitude for the map's initial view.")
-	fs.Float64Var(&initial_longitude, InitialLongitude, -122.431272, "A valid longitude for the map's initial view.")
-	fs.IntVar(&initial_zoom, InitialZoom, 15, "A valid zoom level for the map's initial view.")
 
 	return nil
 }
 
-func ProviderOptionsFromFlagSet(fs *flag.FlagSet) (*ProviderOptions, error) {
+func AppendProtomapsProviderFlags(fs *flag.FlagSet) error {
 
-	opts := &ProviderOptions{
-		InitialLatitude:  initial_latitude,
-		InitialLongitude: initial_longitude,
-		InitialZoom:      initial_zoom,
-	}
+	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "/tiles/", "A valid Protomaps .pmtiles URL for loading map tiles.")
 
-	leaflet_opts := leaflet.DefaultLeafletOptions()
+	fs.BoolVar(&protomaps_serve_tiles, ProtomapsServeTilesFlag, false, "A boolean flag signaling whether to serve Protomaps tiles locally.")
+	fs.IntVar(&protomaps_cache_size, ProtomapsCacheSizeFlag, 64, "The size of the internal Protomaps cache if serving tiles locally.")
+	fs.StringVar(&protomaps_bucket_uri, ProtomapsBucketURIFlag, "", "The gocloud.dev/blob.Bucket URI where Protomaps tiles are stored.")
+	fs.StringVar(&protomaps_database, ProtomapsDatabaseFlag, "", "The name of the Protomaps database to serve tiles from.")
+
+	return nil
+}
+
+func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
+
+	u := url.URL{}
+	u.Scheme = map_provider
+
+	q := url.Values{}
 
 	if leaflet_enable_hash {
-		leaflet_opts.EnableHash()
+		q.Set("leaflet-enable-hash", strconv.FormatBool(leaflet_enable_hash))
 	}
 
 	if leaflet_enable_fullscreen {
-		leaflet_opts.EnableFullscreen()
+		q.Set("leaflet-enable-fullscreen", strconv.FormatBool(leaflet_enable_fullscreen))
 	}
 
 	if leaflet_enable_draw {
-		leaflet_opts.EnableDraw()
+		q.Set("leaflet-enable-draw", strconv.FormatBool(leaflet_enable_draw))
 	}
 
-	opts.LeafletOptions = leaflet_opts
-
-	switch strings.ToLower(map_provider) {
+	switch map_provider {
 	case "protomaps":
 
-		pm_opts := protomaps.DefaultProtomapsOptions()
-		pm_opts.TileURL = protomaps_tile_url
+		q.Set(ProtomapsTileURLFlag, protomaps_tile_url)
 
-		opts.ProtomapsOptions = pm_opts
-		opts.Provider = ProtomapsProvider
+		if protomaps_serve_tiles {
 
-	case "tangramjs":
+			q.Set(ProtomapsServeTilesFlag, strconv.FormatBool(protomaps_serve_tiles))
+			q.Set(ProtomapsCacheSizeFlag, strconv.Itoa(protomaps_cache_size))
+			q.Set(ProtomapsBucketURIFlag, protomaps_bucket_uri)
+			q.Set(ProtomapsDatabaseFlag, protomaps_database)
+		}
 
-		tangramjs_opts := tangramjs.DefaultTangramJSOptions()
-		tangramjs_opts.NextzenOptions.APIKey = nextzen_apikey
-		tangramjs_opts.NextzenOptions.StyleURL = nextzen_style_url
-		tangramjs_opts.NextzenOptions.TileURL = nextzen_tile_url
+	case "tangram":
 
-		opts.TangramJSOptions = tangramjs_opts
-		opts.Provider = TangramJSProvider
+		q.Set("nextzen-apikey", nextzen_apikey)
+
+		if nextzen_style_url != "" {
+			q.Set("nextzen-style-url", nextzen_style_url)
+		}
+
+		if nextzen_tile_url != "" {
+			q.Set("nextzen-tile-url", nextzen_tile_url)
+		}
+
+		if tilezen_enable_tilepack {
+
+			q.Set("tilezen-enable-tilepack", strconv.FormatBool(tilezen_enable_tilepack))
+			q.Set("tilezen-tilepack-path", tilezen_tilepack_path)
+			q.Set("tilezen-tilepack-url", "/tilezen/")
+
+			q.Del("nextzen-tile-url")
+			q.Set("nextzen-tile-url", "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt")
+		}
 
 	default:
-		return nil, fmt.Errorf("Unknown or unsupported map provider '%s'", map_provider)
+		// pass
 	}
 
-	if tilezen_enable_tilepack {
-		opts.TilezenEnableTilepack = true
-		opts.TilezenTilepackPath = tilezen_tilepack_path
-		opts.TilezenTilepackURL = "/tilezen/"
-
-		if strings.ToLower(map_provider) == "tangramjs" {
-			opts.TangramJSOptions.NextzenOptions.TileURL = "/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt"
-		}
-	}
-
-	return opts, nil
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }

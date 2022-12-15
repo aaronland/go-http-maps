@@ -1,115 +1,99 @@
 package provider
 
 import (
+	"context"
 	"fmt"
-	"github.com/aaronland/go-http-leaflet"
-	"github.com/aaronland/go-http-tangramjs"
-	"github.com/sfomuseum/go-http-protomaps"
-	tilepack_http "github.com/tilezen/go-tilepacks/http"
-	"github.com/tilezen/go-tilepacks/tilepack"
-	_ "log"
+	"github.com/aaronland/go-roster"
+	"log"
 	"net/http"
+	"net/url"
+	"sort"
+	"strings"
 )
 
-const (
-	UnknownProvider Provider = iota
-	TangramJSProvider
-	ProtomapsProvider
-)
-
-type Provider int
-
-func (p Provider) String() string {
-	switch p {
-	case TangramJSProvider:
-		return "tangramjs"
-	case ProtomapsProvider:
-		return "protomaps"
-	default:
-		return "unknown"
-	}
+type Provider interface {
+	Scheme() string
+	AppendResourcesHandler(handler http.Handler) http.Handler
+	AppendAssetHandlers(mux *http.ServeMux) error
+	SetLogger(*log.Logger) error
 }
 
-type ProviderOptions struct {
-	Provider              Provider
-	LeafletOptions        *leaflet.LeafletOptions
-	TangramJSOptions      *tangramjs.TangramJSOptions
-	ProtomapsOptions      *protomaps.ProtomapsOptions
-	TilezenEnableTilepack bool
-	TilezenTilepackPath   string
-	TilezenTilepackURL    string
-	InitialLatitude       float64
-	InitialLongitude      float64
-	InitialZoom           int
-}
+var provider_roster roster.Roster
 
-func init() {
-	tangramjs.APPEND_LEAFLET_RESOURCES = false
-	tangramjs.APPEND_LEAFLET_ASSETS = false
-	protomaps.APPEND_LEAFLET_RESOURCES = false
-	protomaps.APPEND_LEAFLET_ASSETS = false
-}
+// ProviderInitializationFunc is a function defined by individual provider package and used to create
+// an instance of that provider
+type ProviderInitializationFunc func(ctx context.Context, uri string) (Provider, error)
 
-func AppendResourcesHandler(handler http.Handler, opts *ProviderOptions) http.Handler {
+// RegisterProvider registers 'scheme' as a key pointing to 'init_func' in an internal lookup table
+// used to create new `Provider` instances by the `NewProvider` method.
+func RegisterProvider(ctx context.Context, scheme string, init_func ProviderInitializationFunc) error {
 
-	handler = leaflet.AppendResourcesHandler(handler, opts.LeafletOptions)
-
-	switch opts.Provider {
-	case ProtomapsProvider:
-
-		handler = protomaps.AppendResourcesHandler(handler, opts.ProtomapsOptions)
-
-	case TangramJSProvider:
-
-		handler = tangramjs.AppendResourcesHandler(handler, opts.TangramJSOptions)
-
-	default:
-		// pass
-	}
-
-	return handler
-}
-
-func AppendAssetHandlers(mux *http.ServeMux, opts *ProviderOptions) error {
-
-	err := leaflet.AppendAssetHandlers(mux)
+	err := ensureProviderRoster()
 
 	if err != nil {
 		return err
 	}
 
-	switch opts.Provider {
-	case ProtomapsProvider:
+	return provider_roster.Register(ctx, scheme, init_func)
+}
 
-		err := protomaps.AppendAssetHandlers(mux)
+func ensureProviderRoster() error {
 
-		if err != nil {
-			return err
-		}
+	if provider_roster == nil {
 
-	case TangramJSProvider:
-
-		err := tangramjs.AppendAssetHandlers(mux)
+		r, err := roster.NewDefaultRoster()
 
 		if err != nil {
 			return err
 		}
 
-		if opts.TilezenEnableTilepack {
-
-			tilepack_reader, err := tilepack.NewMbtilesReader(opts.TilezenTilepackPath)
-
-			if err != nil {
-				return fmt.Errorf("Failed to create tilepack reader, %w", err)
-			}
-
-			tilepack_handler := tilepack_http.MbtilesHandler(tilepack_reader)
-			mux.Handle(opts.TilezenTilepackURL, tilepack_handler)
-		}
-
-	default:
-		return fmt.Errorf("Invalid or unsupporter map provider '%v'", opts.Provider)
+		provider_roster = r
 	}
 
 	return nil
+}
+
+// NewProvider returns a new `Provider` instance configured by 'uri'. The value of 'uri' is parsed
+// as a `url.URL` and its scheme is used as the key for a corresponding `ProviderInitializationFunc`
+// function used to instantiate the new `Provider`. It is assumed that the scheme (and initialization
+// function) have been registered by the `RegisterProvider` method.
+func NewProvider(ctx context.Context, uri string) (Provider, error) {
+
+	u, err := url.Parse(uri)
+
+	if err != nil {
+		return nil, err
+	}
+
+	scheme := u.Scheme
+
+	i, err := provider_roster.Driver(ctx, scheme)
+
+	if err != nil {
+		return nil, err
+	}
+
+	init_func := i.(ProviderInitializationFunc)
+	return init_func(ctx, uri)
+}
+
+// Schemes returns the list of schemes that have been registered.
+func Schemes() []string {
+
+	ctx := context.Background()
+	schemes := []string{}
+
+	err := ensureProviderRoster()
+
+	if err != nil {
+		return schemes
+	}
+
+	for _, dr := range provider_roster.Drivers(ctx) {
+		scheme := fmt.Sprintf("%s://", strings.ToLower(dr))
+		schemes = append(schemes, scheme)
+	}
+
+	sort.Strings(schemes)
+	return schemes
 }
