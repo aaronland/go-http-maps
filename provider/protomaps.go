@@ -15,7 +15,6 @@ type ProtomapsProvider struct {
 	Provider
 	leafletOptions   *leaflet.LeafletOptions
 	protomapsOptions *protomaps.ProtomapsOptions
-	mapOptions       *MapOptions
 }
 
 func init() {
@@ -51,16 +50,9 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		return nil, fmt.Errorf("Failed to create protomaps options, %w", err)
 	}
 
-	map_opts, err := MapOptionsFromURL(u)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create map options, %w", err)
-	}
-
 	p := &ProtomapsProvider{
 		leafletOptions:   leaflet_opts,
 		protomapsOptions: protomaps_opts,
-		mapOptions:       map_opts,
 	}
 
 	return p, nil

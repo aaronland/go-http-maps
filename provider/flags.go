@@ -91,7 +91,7 @@ func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 
 		q.Set("tile-url", protomaps_tile_url)
 
-	case "nextzen":
+	case "tangram":
 
 		q.Set("nextzen-apikey", nextzen_apikey)
 

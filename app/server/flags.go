@@ -18,8 +18,8 @@ func DefaultFlagSet() (*flag.FlagSet, error) {
 
 	fs.StringVar(&server_uri, "server-uri", "http://localhost:8080", "A valid aaronland/go-http-server URI")
 
-	fs.Float64Var(&initial_latitude, "initial-latitude", 0.0, "...")
-	fs.Float64Var(&initial_longitude, "initial-longitude", 0.0, "...")
+	fs.Float64Var(&initial_latitude, "initial-latitude", 37.61799, "...")
+	fs.Float64Var(&initial_longitude, "initial-longitude", -122.370943, "...")
 	fs.IntVar(&initial_zoom, "initial-zoom", 12, "...")
 
 	err := provider.AppendProviderFlags(fs)

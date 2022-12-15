@@ -94,7 +94,7 @@ aaronland.maps = (function(){
 		});
 	    }
 
-	    if (map_provider == "tangramjs"){
+	    if (map_provider == "tangram"){
 
 		map.setMaxZoom(17.99);	// TO DO: make this Z20 or something...
 		

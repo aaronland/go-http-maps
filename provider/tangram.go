@@ -7,26 +7,30 @@ import (
 	"github.com/aaronland/go-http-tangramjs"
 	tilepack_http "github.com/tilezen/go-tilepacks/http"
 	"github.com/tilezen/go-tilepacks/tilepack"
+	"log"
 	"net/http"
 	"net/url"
 )
 
-const NEXTZEN_SCHEME string = "nextzen"
+const TANGRAM_SCHEME string = "tangram"
 
-type NextzenProvider struct {
+type TangramProvider struct {
 	Provider
 	leafletOptions *leaflet.LeafletOptions
 	tangramOptions *tangramjs.TangramJSOptions
-	mapOptions     *MapOptions
 	tilezenOptions *TilezenOptions
 }
 
 func init() {
+
+	log.Println("WHAT")
+
 	tangramjs.APPEND_LEAFLET_RESOURCES = false
 	tangramjs.APPEND_LEAFLET_ASSETS = false
 
 	ctx := context.Background()
-	RegisterProvider(ctx, NEXTZEN_SCHEME, NewNextzenProvider)
+	RegisterProvider(ctx, TANGRAM_SCHEME, NewTangramProvider)
+	RegisterProvider(ctx, "tangramjs", NewTangramProvider)
 }
 
 func TangramJSOptionsFromURL(u *url.URL) (*tangramjs.TangramJSOptions, error) {
@@ -34,7 +38,7 @@ func TangramJSOptionsFromURL(u *url.URL) (*tangramjs.TangramJSOptions, error) {
 	return opts, nil
 }
 
-func NewNextzenProvider(ctx context.Context, uri string) (Provider, error) {
+func NewTangramProvider(ctx context.Context, uri string) (Provider, error) {
 
 	u, err := url.Parse(uri)
 
@@ -60,33 +64,26 @@ func NewNextzenProvider(ctx context.Context, uri string) (Provider, error) {
 		return nil, fmt.Errorf("Failed to create tilezen options, %w", err)
 	}
 
-	map_opts, err := MapOptionsFromURL(u)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create map options, %w", err)
-	}
-
-	p := &NextzenProvider{
+	p := &TangramProvider{
 		leafletOptions: leaflet_opts,
 		tangramOptions: tangram_opts,
 		tilezenOptions: tilezen_opts,
-		mapOptions:     map_opts,
 	}
 
 	return p, nil
 }
 
-func (p *NextzenProvider) Scheme() string {
-	return NEXTZEN_SCHEME
+func (p *TangramProvider) Scheme() string {
+	return TANGRAM_SCHEME
 }
 
-func (p *NextzenProvider) AppendResourcesHandler(handler http.Handler) http.Handler {
+func (p *TangramProvider) AppendResourcesHandler(handler http.Handler) http.Handler {
 	handler = leaflet.AppendResourcesHandler(handler, p.leafletOptions)
 	handler = tangramjs.AppendResourcesHandler(handler, p.tangramOptions)
 	return handler
 }
 
-func (p *NextzenProvider) AppendAssetHandlers(mux *http.ServeMux) error {
+func (p *TangramProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 
 	err := leaflet.AppendAssetHandlers(mux)
 
