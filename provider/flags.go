@@ -2,6 +2,7 @@ package provider
 
 import (
 	"flag"
+	"fmt"
 	"github.com/aaronland/go-http-tangramjs"
 	"net/url"
 	"strconv"
@@ -47,22 +48,76 @@ const TilezenTilepackPath string = "tilezen-tilepack-path"
 
 var tilezen_tilepack_path string
 
+const ProtomapsServeTilesFlag string = "protomaps-serve-tiles"
+
+var protomaps_serve_tiles bool
+
+const ProtomapsCacheSizeFlag string = "protomaps-caches-size"
+
+var protomaps_cache_size int
+
+const ProtomapsBucketURIFlag string = "protomaps-bucket-uri"
+
+var protomaps_bucket_uri string
+
+const ProtomapsDatabaseFlag string = "protomaps-database"
+
+var protomaps_database string
+
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.StringVar(&map_provider, MapProviderFlag, "", "...")
+
+	err := AppendLeafletFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append Leaflet flags, %w", err)
+	}
+
+	err = AppendTangramProviderFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append TangramJS flags, %w", err)
+	}
+
+	err = AppendProtomapsProviderFlags(fs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to append Protomaps flags, %w", err)
+	}
+
+	return nil
+}
+
+func AppendLeafletFlags(fs *flag.FlagSet) error {
 
 	fs.BoolVar(&leaflet_enable_hash, LeafletEnableHashFlag, true, "Enable the Leaflet.Hash plugin.")
 	fs.BoolVar(&leaflet_enable_fullscreen, LeafletEnableFullscreenFlag, false, "Enable the Leaflet.Fullscreen plugin.")
 	fs.BoolVar(&leaflet_enable_draw, LeafletEnableDrawFlag, false, "Enable the Leaflet.Draw plugin.")
 
+	return nil
+}
+
+func AppendTangramProviderFlags(fs *flag.FlagSet) error {
+
 	fs.StringVar(&nextzen_apikey, NextzenAPIKeyFlag, "", "A valid Nextzen API key")
 	fs.StringVar(&nextzen_style_url, NextzenStyleURLFlag, "/tangram/refill-style.zip", "A valid URL for loading a Tangram.js style bundle.")
 	fs.StringVar(&nextzen_tile_url, NextzenTileURLFlag, tangramjs.NEXTZEN_MVT_ENDPOINT, "A valid Nextzen tile URL template for loading map tiles.")
 
-	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "", "A valid Protomaps .pmtiles URL for loading map tiles.")
-
 	fs.BoolVar(&tilezen_enable_tilepack, TilezenEnableTilepack, false, "Enable to use of Tilezen MBTiles tilepack for tile-serving.")
 	fs.StringVar(&tilezen_tilepack_path, TilezenTilepackPath, "", "The path to the Tilezen MBTiles tilepack to use for serving tiles.")
+
+	return nil
+}
+
+func AppendProtomapsProviderFlags(fs *flag.FlagSet) error {
+
+	fs.StringVar(&protomaps_tile_url, ProtomapsTileURLFlag, "", "A valid Protomaps .pmtiles URL for loading map tiles.")
+
+	fs.BoolVar(&protomaps_serve_tiles, ProtomapsServeTilesFlag, false, "A boolean flag signaling whether to serve Protomaps tiles locally.")
+	fs.IntVar(&protomaps_cache_size, ProtomapsCacheSizeFlag, 64, "The size of the internal Protomaps cache if serving tiles locally.")
+	fs.StringVar(&protomaps_bucket_uri, ProtomapsBucketURIFlag, "", "The gocloud.dev/blob.Bucket URI where Protomaps tiles are stored.")
+	fs.StringVar(&protomaps_database, ProtomapsDatabaseFlag, "", "The name of the Protomaps database to serve tiles from.")
 
 	return nil
 }
@@ -89,7 +144,15 @@ func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 	switch map_provider {
 	case "protomaps":
 
-		q.Set("tile-url", protomaps_tile_url)
+		q.Set(ProtomapsTileURLFlag, protomaps_tile_url)
+
+		if protomaps_serve_tiles {
+
+			q.Set(ProtomapsServeTilesFlag, strconv.FormatBool(protomaps_serve_tiles))
+			q.Set(ProtomapsCacheSizeFlag, strconv.Itoa(protomaps_cache_size))
+			q.Set(ProtomapsBucketURIFlag, protomaps_bucket_uri)
+			q.Set(ProtomapsDatabaseFlag, protomaps_database)
+		}
 
 	case "tangram":
 

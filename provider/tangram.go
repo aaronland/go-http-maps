@@ -7,6 +7,7 @@ import (
 	"github.com/aaronland/go-http-tangramjs"
 	tilepack_http "github.com/tilezen/go-tilepacks/http"
 	"github.com/tilezen/go-tilepacks/tilepack"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,11 +20,10 @@ type TangramProvider struct {
 	leafletOptions *leaflet.LeafletOptions
 	tangramOptions *tangramjs.TangramJSOptions
 	tilezenOptions *TilezenOptions
+	logger         *log.Logger
 }
 
 func init() {
-
-	log.Println("WHAT")
 
 	tangramjs.APPEND_LEAFLET_RESOURCES = false
 	tangramjs.APPEND_LEAFLET_ASSETS = false
@@ -34,7 +34,25 @@ func init() {
 }
 
 func TangramJSOptionsFromURL(u *url.URL) (*tangramjs.TangramJSOptions, error) {
+
 	opts := tangramjs.DefaultTangramJSOptions()
+
+	q := u.Query()
+
+	opts.NextzenOptions.APIKey = q.Get("nextzen-apikey")
+
+	q_style_url := q.Get("nextzen-style-url")
+
+	if q_style_url != "" {
+		opts.NextzenOptions.StyleURL = q_style_url
+	}
+
+	q_tile_url := q.Get("nextzen-tile-url")
+
+	if q_style_url != "" {
+		opts.NextzenOptions.TileURL = q_tile_url
+	}
+
 	return opts, nil
 }
 
@@ -64,10 +82,13 @@ func NewTangramProvider(ctx context.Context, uri string) (Provider, error) {
 		return nil, fmt.Errorf("Failed to create tilezen options, %w", err)
 	}
 
+	logger := log.New(io.Discard, "", 0)
+
 	p := &TangramProvider{
 		leafletOptions: leaflet_opts,
 		tangramOptions: tangram_opts,
 		tilezenOptions: tilezen_opts,
+		logger:         logger,
 	}
 
 	return p, nil
@@ -109,5 +130,10 @@ func (p *TangramProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 		mux.Handle(p.tilezenOptions.TilepackURL, tilepack_handler)
 	}
 
+	return nil
+}
+
+func (p *TangramProvider) SetLogger(logger *log.Logger) error {
+	p.logger = logger
 	return nil
 }

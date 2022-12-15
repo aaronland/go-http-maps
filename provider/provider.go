@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/aaronland/go-roster"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -14,6 +15,7 @@ type Provider interface {
 	Scheme() string
 	AppendResourcesHandler(handler http.Handler) http.Handler
 	AppendAssetHandlers(mux *http.ServeMux) error
+	SetLogger(*log.Logger) error
 }
 
 var provider_roster roster.Roster

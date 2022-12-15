@@ -47,6 +47,12 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 		return fmt.Errorf("Failed to create new provider, %w", err)
 	}
 
+	err = pr.SetLogger(logger)
+
+	if err != nil {
+		return fmt.Errorf("Failed to set logger for provider, %w", err)
+	}
+
 	mux := http.NewServeMux()
 
 	err = bootstrap.AppendAssetHandlers(mux)
