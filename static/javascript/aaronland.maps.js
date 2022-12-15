@@ -77,31 +77,27 @@ aaronland.maps = (function(){
 	    var map = L.map(map_id, map_args);
 
 	    var map_provider = map_el.getAttribute("data-map-provider");
-	    
-	    if (map_provider == "protomaps"){
-		
-		var pm_uri = document.body.getAttribute("data-protomaps-tile-url");		
-		var pm = new protomaps.PMTiles(pm_uri);
 
-		pm.metadata().then(m => {		
-                    let bounds_str = m.bounds.split(',');
-                    let bounds = [[+bounds_str[1],+bounds_str[0]],[+bounds_str[3],+bounds_str[2]]];
-                    let url = pm_uri;
-                    layer = new protomaps.LeafletLayer({url:url, bounds:bounds});
-                    layer.addTo(map);
-                    // map.fitBounds(bounds);
-		    map.setMaxBounds(bounds);
-		});
-	    }
-
-	    if (map_provider == "tangram"){
-
-		map.setMaxZoom(17.99);	// TO DO: make this Z20 or something...
+	    switch (map_provider) {
+		    
+		case "protomaps":
 		
-		var tangram_opts = self.getTangramOptions();	   
-		var tangramLayer = Tangram.leafletLayer(tangram_opts);
-		
-		tangramLayer.addTo(map);
+		    var tile_url = document.body.getAttribute("data-protomaps-tile-url");
+		    
+		    var layer = protomaps.leafletLayer({url:tile_url})
+		    layer.addTo(map);
+		    break;
+		    
+		case "tangram":
+		    
+		    map.setMaxZoom(17.99);	// TO DO: make this Z20 or something...
+		    
+		    var tangram_opts = self.getTangramOptions();	   
+		    var tangramLayer = Tangram.leafletLayer(tangram_opts);
+		    
+		    tangramLayer.addTo(map);
+		default:
+		    console.log("Unsupported map provider ", map_provider);
 	    }
 
 	    var attribution = self.getAttribution(map_provider);
