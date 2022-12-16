@@ -134,8 +134,19 @@ func (p *TangramProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pref
 			return fmt.Errorf("Failed to create tilepack reader, %w", err)
 		}
 
+		tilepack_url := p.tilezenOptions.TilepackURL
+
+		if prefix != "" {
+
+			tilepack_url, err = url.JoinPath(prefix, tilepack_url)
+
+			if err != nil {
+				return fmt.Errorf("Failed to join path with %s and %s", prefix, tilepack_url)
+			}
+		}
+
 		tilepack_handler := tilepack_http.MbtilesHandler(tilepack_reader)
-		mux.Handle(p.tilezenOptions.TilepackURL, tilepack_handler)
+		mux.Handle(tilepack_url, tilepack_handler)
 	}
 
 	return nil

@@ -160,15 +160,29 @@ func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pr
 
 		loop.Start()
 
+		path_tiles := p.path_tiles
+
+		if prefix != "" {
+
+			path_tiles, err = url.JoinPath(prefix, path_tiles)
+
+			if err != nil {
+				return fmt.Errorf("Failed to join path with %s and %s", prefix, path_tiles)
+			}
+		}
+
 		pmtiles_handler := pmhttp.TileHandler(loop, p.logger)
 
-		strip_path := strings.TrimRight(p.path_tiles, "/")
+		strip_path := strings.TrimRight(path_tiles, "/")
 		pmtiles_handler = http.StripPrefix(strip_path, pmtiles_handler)
 
 		mux.Handle(p.path_tiles, pmtiles_handler)
 
 		// Because inevitably I will forget...
 		protomaps_tiles_database := strings.Replace(p.database, ".pmtiles", "", 1)
+
+		// Note: We are NOT using the local path_tiles because that will have the prefix
+		// assigned by AppendResourcesHandlerWithPrefix
 
 		pm_tile_url, err := url.JoinPath(p.path_tiles, protomaps_tiles_database)
 
