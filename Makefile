@@ -1,5 +1,8 @@
 CWD=$(shell pwd)
 
+cli:
+	go build -o bin/server cmd/server/main.go
+
 debug-tangram:
 	go run -mod vendor cmd/server/main.go -map-provider tangram -nextzen-apikey $(APIKEY)
 
