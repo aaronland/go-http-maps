@@ -148,8 +148,6 @@ func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pr
 		return fmt.Errorf("Failed to append protomaps asset handler, %w", err)
 	}
 
-	// to do: prefix stuff...
-
 	if p.serve_tiles {
 
 		loop, err := pmtiles.NewLoop(p.bucket_uri, p.logger, p.cache_size, "")
