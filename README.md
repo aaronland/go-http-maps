@@ -60,7 +60,7 @@ $> ./bin/server -h
 
 #### protomaps
 
-![](docs/images/go-http-maps-protomaps.png)
+![](docs/images/http-maps-protomaps.png)
 
 ```
 go run -mod vendor cmd/server/main.go \
@@ -72,7 +72,7 @@ go run -mod vendor cmd/server/main.go \
 
 #### tangram
 
-![](docs/images/go-http-maps-tangram.png)
+![](docs/images/http-maps-tangram.png)
 
 ```
 go run -mod vendor cmd/server/main.go \
@@ -91,7 +91,7 @@ go run -mod vendor cmd/server/main.go \
 
 #### leafet
 
-![](docs/images/go-http-maps-leaflet.png)
+![](docs/images/http-maps-leaflet.png)
 
 ```
 go run -mod vendor cmd/server/main.go \
