@@ -79,6 +79,14 @@ aaronland.maps = (function(){
 	    var map_provider = map_el.getAttribute("data-map-provider");
 
 	    switch (map_provider) {
+
+		case "leaflet":
+
+		    var tile_url = document.body.getAttribute("data-leaflet-tile-url");
+
+		    var layer = L.tileLayer(tile_url);
+		    layer.addTo(map);
+		    break;
 		    
 		case "protomaps":
 		

@@ -19,6 +19,12 @@ type LeafletProvider struct {
 	logger         *log.Logger
 }
 
+func init() {
+
+	ctx := context.Background()
+	RegisterProvider(ctx, LEAFLET_SCHEME, NewLeafletProvider)
+}
+
 func LeafletOptionsFromURL(u *url.URL) (*leaflet.LeafletOptions, error) {
 
 	opts := leaflet.DefaultLeafletOptions()
@@ -68,6 +74,12 @@ func LeafletOptionsFromURL(u *url.URL) (*leaflet.LeafletOptions, error) {
 		if v == true {
 			opts.EnableDraw()
 		}
+	}
+
+	q_tile_url := q.Get(LeafletTileURLFlag)
+
+	opts.DataAttributes = map[string]string{
+		"leaflet-tile-url": q_tile_url,
 	}
 
 	return opts, nil
