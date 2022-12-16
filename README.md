@@ -6,7 +6,7 @@ Go package providing opinionated HTTP middleware for web-based map tiles.
 
 This is work in progress. Documentation is incomplete.
 
-Until then have a look at [app/server/main.go](app/server/main.go), [templates/html/map.html](templates/html/map.html) and [static/javascript/aaronland.map.init.js](static/javascript/aaronland.map.init.js) for an example of working code.
+Until then have a look at [app/server/server.go](app/server/server.go), [templates/html/map.html](templates/html/map.html) and [static/javascript/aaronland.map.init.js](static/javascript/aaronland.map.init.js) for an example of working code.
 
 ## Example
 
