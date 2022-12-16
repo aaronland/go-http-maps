@@ -5,6 +5,7 @@ import (
 	"github.com/aaronland/go-http-maps/static"
 	"github.com/aaronland/go-http-rewrite"
 	"io/fs"
+	_ "log"
 	"net/http"
 	"path/filepath"
 	"strings"

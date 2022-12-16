@@ -2,6 +2,7 @@ package maps
 
 import (
 	"fmt"
+	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/static"
 	"github.com/aaronland/go-http-rewrite"
 	"io/fs"
@@ -13,8 +14,9 @@ import (
 
 // MapsOptions provides a list of JavaScript and CSS link to include with HTML output.
 type MapsOptions struct {
-	JS  []string
-	CSS []string
+	JS             []string
+	CSS            []string
+	DataAttributes map[string]string
 }
 
 // Return a *MapsOptions struct with default paths and URIs.
@@ -27,9 +29,16 @@ func DefaultMapsOptions() *MapsOptions {
 		JS: []string{
 			"/javascript/aaronland.maps.js",
 		},
+		DataAttributes: make(map[string]string),
 	}
 
 	return opts
+}
+
+func AppendResourcesHandlerWithPrefixAndProvider(next gohttp.Handler, map_provider provider.Provider, maps_opts *MapsOptions, prefix string) gohttp.Handler {
+	next = map_provider.AppendResourcesHandlerWithPrefix(next, prefix)
+	next = AppendResourcesHandlerWithPrefix(next, maps_opts, prefix)
+	return next
 }
 
 // AppendResourcesHandler will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript and CSS files and related assets.
@@ -55,8 +64,9 @@ func AppendResourcesHandlerWithPrefix(next gohttp.Handler, opts *MapsOptions, pr
 	}
 
 	ext_opts := &rewrite.AppendResourcesOptions{
-		JavaScript:  js,
-		Stylesheets: css,
+		JavaScript:     js,
+		Stylesheets:    css,
+		DataAttributes: opts.DataAttributes,
 	}
 
 	return rewrite.AppendResourcesHandler(next, ext_opts)
