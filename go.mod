@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/aaronland/go-http-bootstrap v0.1.0
-	github.com/aaronland/go-http-leaflet v0.1.1
+	github.com/aaronland/go-http-leaflet v0.1.2
 	github.com/aaronland/go-http-rewrite v1.0.1
 	github.com/aaronland/go-http-server v1.0.0
 	github.com/aaronland/go-http-tangramjs v0.1.3
 	github.com/aaronland/go-roster v1.0.0
 	github.com/protomaps/go-pmtiles v1.6.2
 	github.com/sfomuseum/go-flags v0.10.0
-	github.com/sfomuseum/go-http-protomaps v0.0.14
+	github.com/sfomuseum/go-http-protomaps v0.0.15
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.0.3
 	github.com/sfomuseum/go-template v1.2.1
 	github.com/tilezen/go-tilepacks v0.0.0-20220729022432-5ee633f5bb6a

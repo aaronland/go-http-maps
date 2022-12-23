@@ -59,16 +59,16 @@ func AppendResourcesHandler(next http.Handler, opts *LeafletOptions) http.Handle
 // AppendResourcesHandlerWithPrefix will rewrite any HTML produced by previous handler to include the necessary markup to load Leaflet JavaScript files and related assets ensuring that all URIs are prepended with a prefix.
 func AppendResourcesHandlerWithPrefix(next http.Handler, opts *LeafletOptions, prefix string) http.Handler {
 
-	js := opts.JS
-	css := opts.CSS
+	js := make([]string, len(opts.JS))
+	css := make([]string, len(opts.CSS))
 
 	if prefix != "" {
 
-		for i, path := range js {
+		for i, path := range opts.JS {
 			js[i] = appendPrefix(prefix, path)
 		}
 
-		for i, path := range css {
+		for i, path := range opts.CSS {
 			css[i] = appendPrefix(prefix, path)
 		}
 	}
