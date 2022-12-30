@@ -12,6 +12,7 @@ import (
 	"github.com/protomaps/go-pmtiles/pmtiles"
 	"github.com/sfomuseum/go-http-protomaps"
 	pmhttp "github.com/sfomuseum/go-sfomuseum-pmtiles/http"
+	"github.com/sfomuseum/runtimevar"
 	"io"
 	"log"
 	"net/http"
@@ -99,6 +100,31 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		protomapsOptions: protomaps_opts,
 		logger:           logger,
 		rulesTemplate:    rules_t,
+	}
+
+	custom_paint_uri := q.Get(ProtomapsPaintRulesURIFlag)
+	custom_labels_uri := q.Get(ProtomapsLabelRulesURIFlag)
+
+	if custom_paint_uri != "" {
+
+		paint_rules, err := runtimevar.StringVar(ctx, custom_paint_uri)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to derive custom paint rules from %s= query parameter, %w", ProtomapsPaintRulesURIFlag, err)
+		}
+
+		p.paintRules = paint_rules
+	}
+
+	if custom_labels_uri != "" {
+
+		label_rules, err := runtimevar.StringVar(ctx, custom_labels_uri)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to derive custom label rules from %s= query parameter, %w", ProtomapsLabelRulesURIFlag, err)
+		}
+
+		p.labelRules = label_rules
 	}
 
 	serve_tiles := false
