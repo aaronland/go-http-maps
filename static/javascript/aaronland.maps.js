@@ -91,8 +91,14 @@ aaronland.maps = (function(){
 		case "protomaps":
 		
 		    var tile_url = document.body.getAttribute("data-protomaps-tile-url");
+
+		    var args = {
+			url: tile_url,
+			// paint_rules: paint_rules,
+			// label_rules: label_rules,		
+		    };
 		    
-		    var layer = protomaps.leafletLayer({url:tile_url})
+		    var layer = protomaps.leafletLayer(args)
 		    layer.addTo(map);
 		    break;
 		    

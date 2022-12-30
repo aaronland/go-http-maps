@@ -169,8 +169,8 @@ github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d/go.mod h1:H
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
-github.com/aaronland/go-http-bootstrap v0.1.0 h1:ayVCu88SDUyptVN/scPMtC8jUor0h2lcoN/3ulfuwwo=
-github.com/aaronland/go-http-bootstrap v0.1.0/go.mod h1:LBQ4TNCD74+4KKEmBIIzrMxeAksRp/wQ7FPA8VZ/v4E=
+github.com/aaronland/go-http-bootstrap v0.2.0 h1:eNIppbaFJvTDEbF+vJ5xFBZEgMhcDbvrcWSJfB1tK/w=
+github.com/aaronland/go-http-bootstrap v0.2.0/go.mod h1:Dd4Z7H55XdgB7JyVma3cFvKQZDdyCaOo/0Dl7qjAu/A=
 github.com/aaronland/go-http-leaflet v0.1.0/go.mod h1:M6Brt/UMWXsT+3qK5idwxr3y6kELHHi7OhgoiecMt6U=
 github.com/aaronland/go-http-leaflet v0.1.2 h1:GqatiNzhyJF/LiDGGh/LTHmpDQiPaDgR3mCmLV2Bnh0=
 github.com/aaronland/go-http-leaflet v0.1.2/go.mod h1:M6Brt/UMWXsT+3qK5idwxr3y6kELHHi7OhgoiecMt6U=
@@ -1273,8 +1273,8 @@ github.com/sfomuseum/go-http-protomaps v0.0.15 h1:E7oTqxGjn4c93BFOaveju+kXJU+ANi
 github.com/sfomuseum/go-http-protomaps v0.0.15/go.mod h1:jMeHqPpNoO30nMX3PaHuI2D+n2vXQScUZ3v9SeRv0/I=
 github.com/sfomuseum/go-sfomuseum-pmtiles v1.0.3 h1:vdENCMTE1mlNGF70g3GXLW0uj7e3cYitvInwP26j1AE=
 github.com/sfomuseum/go-sfomuseum-pmtiles v1.0.3/go.mod h1:ihAhHNZKhUhbBF/OsGYurzqfelcCMwM516T0SBr2HnE=
-github.com/sfomuseum/go-template v1.2.1 h1:vetza00Hf3TP3sW8c2B/++WMInCzBdwAQaPH3TQY78E=
-github.com/sfomuseum/go-template v1.2.1/go.mod h1:JRpTSqjgYv6+PdkoVbX5GmuyCQqnRLd0Yk8LFvLb6/k=
+github.com/sfomuseum/go-template v1.3.0 h1:RI/myQzEJm5Z/B12Q07ulrPA8RtAPI9uxqZqwALcT1E=
+github.com/sfomuseum/go-template v1.3.0/go.mod h1:JRpTSqjgYv6+PdkoVbX5GmuyCQqnRLd0Yk8LFvLb6/k=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/shopspring/decimal v1.2.0/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749/go.mod h1:ZY1cvUeJuFPAdZ/B6v7RHavJWZn2YPVFQ1OSXhCGOkg=
