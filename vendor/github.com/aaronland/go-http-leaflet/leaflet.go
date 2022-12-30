@@ -62,15 +62,12 @@ func AppendResourcesHandlerWithPrefix(next http.Handler, opts *LeafletOptions, p
 	js := make([]string, len(opts.JS))
 	css := make([]string, len(opts.CSS))
 
-	if prefix != "" {
+	for i, path := range opts.JS {
+		js[i] = appendPrefix(prefix, path)
+	}
 
-		for i, path := range opts.JS {
-			js[i] = appendPrefix(prefix, path)
-		}
-
-		for i, path := range opts.CSS {
-			css[i] = appendPrefix(prefix, path)
-		}
+	for i, path := range opts.CSS {
+		css[i] = appendPrefix(prefix, path)
 	}
 
 	ext_opts := &rewrite.AppendResourcesOptions{

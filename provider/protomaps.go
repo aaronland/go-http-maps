@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/aaronland/go-http-leaflet"
-	"github.com/aaronland/go-http-maps/templates/javascript"	
+	"github.com/aaronland/go-http-maps/templates/javascript"
 	"github.com/protomaps/go-pmtiles/pmtiles"
 	"github.com/sfomuseum/go-http-protomaps"
 	pmhttp "github.com/sfomuseum/go-sfomuseum-pmtiles/http"
@@ -23,15 +23,15 @@ import (
 
 const PROTOMAPS_SCHEME string = "protomaps"
 
-const pathRulesJavascript string = "/javascript/aaronland.maps.protomaps.rules.js"
+const pathRulesJavascript string = "/javascript/aaronland.protomaps.rules.js"
 
 type ProtomapsProvider struct {
 	Provider
 	leafletOptions   *leaflet.LeafletOptions
 	protomapsOptions *protomaps.ProtomapsOptions
-	paintRules string
-	labelRules string
-	rulesTemplate *template.Template
+	paintRules       string
+	labelRules       string
+	rulesTemplate    *template.Template
 	logger           *log.Logger
 	serve_tiles      bool
 	cache_size       int
@@ -86,7 +86,7 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 	if t == nil {
 		return nil, fmt.Errorf("Missing 'rules' Javascript template")
 	}
-	
+
 	q := u.Query()
 
 	q_tile_url := q.Get(ProtomapsTileURLFlag)
@@ -98,7 +98,7 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		leafletOptions:   leaflet_opts,
 		protomapsOptions: protomaps_opts,
 		logger:           logger,
-		rulesTemplate: rules_t,
+		rulesTemplate:    rules_t,
 	}
 
 	serve_tiles := false
@@ -220,7 +220,7 @@ func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pr
 	if err != nil {
 		return fmt.Errorf("Failed to assign rules asset handlers, %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -236,20 +236,20 @@ func (p *ProtomapsProvider) appendRulesAssetHandlers(mux *http.ServeMux, prefix 
 	if err != nil {
 		return fmt.Errorf("Failed to create rules handler, %w", err)
 	}
-	
+
 	path_rules := pathRulesJavascript
-	
+
 	if prefix != "" {
-		
+
 		path, err := url.JoinPath(prefix, path_rules)
-	
+
 		if err != nil {
 			return fmt.Errorf("Failed to join path for paint rules, %w", err)
 		}
 
 		path_rules = path
 	}
-	
+
 	mux.Handle(path_rules, rules_handler)
 	return nil
 }
@@ -261,22 +261,22 @@ func (p *ProtomapsProvider) rulesHandler() (http.Handler, error) {
 		LabelRules string
 	}
 
-	vars := ProtomapsRulesVars {
+	vars := ProtomapsRulesVars{
 		PaintRules: p.paintRules,
-		LabelRules: p.labelRules,		
+		LabelRules: p.labelRules,
 	}
 
 	t := p.rulesTemplate
-	
+
 	fn := func(rsp http.ResponseWriter, req *http.Request) {
-		
+
 		rsp.Header().Set("Content-type", "text/javascript")
 
 		err := t.Execute(rsp, vars)
 
 		if err != nil {
 			http.Error(rsp, err.Error(), http.StatusInternalServerError)
-			return			
+			return
 		}
 
 		return

@@ -1,9 +1,8 @@
-{{ define "rules" }}
+{{ define "rules" -}}
 var aaronland = aaronland || {};
-var aaronland.maps = aaronland.maps || {};
-var aaronland.maps.protomaps = aaronland.maps.protomaps || {};
+aaronland.protomaps = aaronland.protomaps || {};
 
-aaronland.maps.protomaps.rules = (function(){
+aaronland.protomaps.rules = (function(){
 
     var self = {
 	'paintRules': function(){
@@ -16,5 +15,5 @@ aaronland.maps.protomaps.rules = (function(){
     };
 
     return self
-}
+})();   
 {{ end }}

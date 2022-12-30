@@ -94,9 +94,18 @@ aaronland.maps = (function(){
 
 		    var args = {
 			url: tile_url,
-			// paint_rules: paint_rules,
-			// label_rules: label_rules,		
 		    };
+
+		    var paint_rules = aaronland.protomaps.rules.paintRules();
+		    var label_rules = aaronland.protomaps.rules.labelRules();
+		    
+		    if (paint_rules){
+			args['paint_rules'] = paint_rules;
+		    }
+		   
+		    if (label_rules){
+			args['label_rules'] = label_rules;
+		    }
 		    
 		    var layer = protomaps.leafletLayer(args)
 		    layer.addTo(map);
