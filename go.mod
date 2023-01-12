@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/aaronland/go-http-bootstrap v0.2.0
-	github.com/aaronland/go-http-leaflet v0.1.3
+	github.com/aaronland/go-http-leaflet v0.2.0
 	github.com/aaronland/go-http-rewrite v1.0.1
 	github.com/aaronland/go-http-server v1.0.0
 	github.com/aaronland/go-http-tangramjs v0.1.3

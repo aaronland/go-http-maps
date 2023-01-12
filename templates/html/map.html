@@ -1,7 +1,7 @@
 {{ define "map" }}
 {{ template "inc_head" . }}
 <div id="container">
-<div id="map" data-map-provider="{{ .MapProvider }}" data-initial-latitude="{{ .InitialLatitude }}" data-initial-longitude="{{ .InitialLongitude }}" data-initial-zoom="{{ .InitialZoom }}"></div>
+<div id="map" data-map-provider="{{ .MapProvider }}" data-initial-latitude="{{ .InitialLatitude }}" data-initial-longitude="{{ .InitialLongitude }}" data-initial-zoom="{{ .InitialZoom }}" data-enable-draw="true"></div>
 <div id="geojson-wrapper">
     <pre id="geojson"></pre>
 </div>

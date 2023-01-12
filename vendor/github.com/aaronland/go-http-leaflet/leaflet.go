@@ -29,10 +29,11 @@ func (opts *LeafletOptions) EnableHash() {
 	opts.JS = append(opts.JS, "/javascript/leaflet-hash.js")
 }
 
-// Append the Javascript and CSS URLs for the Leaflet.Draw plugin.
+// Append the Javascript and CSS URLs for the leaflet-geoman plugin.
+// https://github.com/geoman-io/leaflet-geoman/
 func (opts *LeafletOptions) EnableDraw() {
-	opts.CSS = append(opts.CSS, "/css/leaflet.draw.css")
-	opts.JS = append(opts.JS, "/javascript/leaflet.draw.js")
+	opts.CSS = append(opts.CSS, "/css/leaflet-geoman.css")
+	opts.JS = append(opts.JS, "/javascript/leaflet-geoman.min.js")
 }
 
 // Return a *LeafletOptions struct with default paths and URIs.
