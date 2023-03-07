@@ -1,23 +1,23 @@
 module github.com/aaronland/go-http-maps
 
-go 1.18
+go 1.20
 
 require (
 	github.com/aaronland/go-http-bootstrap v0.2.0
-	github.com/aaronland/go-http-leaflet v0.2.1
+	github.com/aaronland/go-http-leaflet v0.2.2
 	github.com/aaronland/go-http-rewrite v1.0.1
 	github.com/aaronland/go-http-server v1.0.0
 	github.com/aaronland/go-http-static v0.0.2
 	github.com/aaronland/go-http-tangramjs v0.1.3
 	github.com/aaronland/go-roster v1.0.0
-	github.com/protomaps/go-pmtiles v1.6.2
+	github.com/protomaps/go-pmtiles v1.7.0
 	github.com/sfomuseum/go-flags v0.10.0
 	github.com/sfomuseum/go-http-protomaps v0.0.16
-	github.com/sfomuseum/go-sfomuseum-pmtiles v1.0.3
+	github.com/sfomuseum/go-sfomuseum-pmtiles v1.1.0
 	github.com/sfomuseum/go-template v1.5.1
 	github.com/sfomuseum/runtimevar v1.0.4
-	github.com/tilezen/go-tilepacks v0.0.0-20220729022432-5ee633f5bb6a
-	gocloud.dev v0.28.0
+	github.com/tilezen/go-tilepacks v0.0.0-20230304224913-9d1d60a55bc6
+	gocloud.dev v0.29.0
 )
 
 require (
@@ -26,20 +26,20 @@ require (
 	github.com/aaronland/go-string v1.0.0 // indirect
 	github.com/akrylysov/algnhsa v0.12.1 // indirect
 	github.com/aws/aws-lambda-go v1.13.3 // indirect
-	github.com/aws/aws-sdk-go v1.44.163 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.17.1 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.18.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.3 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.19 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.25 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.19 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.26 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.19 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.33.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.25 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.17.5 // indirect
-	github.com/aws/smithy-go v1.13.4 // indirect
+	github.com/aws/aws-sdk-go v1.44.200 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.17.4 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.18.12 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.12 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.28 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.29 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.22 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.35.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.3 // indirect
+	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -54,18 +54,19 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
+	github.com/paulmach/orb v0.7.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/schollz/progressbar/v3 v3.11.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.4.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/term v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/term v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.103.0 // indirect
-	google.golang.org/genproto v0.0.0-20221201204527-e3fa12d562f3 // indirect
-	google.golang.org/grpc v1.51.0 // indirect
+	google.golang.org/api v0.110.0 // indirect
+	google.golang.org/genproto v0.0.0-20230209215440-0dfe4f8abfcc // indirect
+	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	modernc.org/libc v1.16.7 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
