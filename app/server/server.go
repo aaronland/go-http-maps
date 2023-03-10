@@ -4,14 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/aaronland/go-http-bootstrap"
 	"github.com/aaronland/go-http-maps/http/www"
 	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/templates/html"
 	"github.com/aaronland/go-http-server"
-	"github.com/sfomuseum/go-flags/flagset"
-	"log"
-	"net/http"
+	"github.com/sfomuseum/go-flags/flagset"	
 )
 
 func Run(ctx context.Context, logger *log.Logger) error {
