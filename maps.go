@@ -5,7 +5,7 @@ import (
 
 	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/static"
-	aa_static "github.com/aaronland/go-http-static"	
+	aa_static "github.com/aaronland/go-http-static"
 )
 
 // MapsOptions provides a list of JavaScript and CSS link to include with HTML output.
@@ -15,7 +15,7 @@ type MapsOptions struct {
 	DataAttributes map[string]string
 	// AppendJavaScriptAtEOF is a boolean flag to append JavaScript markup at the end of an HTML document
 	// rather than in the <head> HTML element. Default is false
-	AppendJavaScriptAtEOF bool	
+	AppendJavaScriptAtEOF bool
 }
 
 // Return a *MapsOptions struct with default paths and URIs.
@@ -64,5 +64,5 @@ func AppendAssetHandlers(mux *gohttp.ServeMux) error {
 // Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance ensuring that all URLs are prepended with prefix.
 func AppendAssetHandlersWithPrefix(mux *gohttp.ServeMux, prefix string) error {
 
-	return aa_static.AppendStaticAssetHandlersWithPrefix(mux, static.FS, prefix)	
+	return aa_static.AppendStaticAssetHandlersWithPrefix(mux, static.FS, prefix)
 }

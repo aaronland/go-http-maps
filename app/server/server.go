@@ -12,7 +12,8 @@ import (
 	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/templates/html"
 	"github.com/aaronland/go-http-server"
-	"github.com/sfomuseum/go-flags/flagset"	
+	"github.com/sfomuseum/go-flags/flagset"
+	"github.com/sfomuseum/go-flags/lookup"
 )
 
 func Run(ctx context.Context, logger *log.Logger) error {
@@ -29,6 +30,12 @@ func Run(ctx context.Context, logger *log.Logger) error {
 func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) error {
 
 	flagset.Parse(fs)
+
+	js_at_eof, err := lookup.BoolVar(fs, provider.JavaScriptAtEOFFlag)
+
+	if err != nil {
+		return fmt.Errorf("Failed to lookup %s flag, %w", provider.JavaScriptAtEOFFlag, err)
+	}
 
 	t, err := html.LoadTemplates(ctx)
 
@@ -89,6 +96,8 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 	}
 
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
+	bootstrap_opts.AppendJavaScriptAtEOF = js_at_eof
+
 	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
 
 	map_handler = pr.AppendResourcesHandler(map_handler)
