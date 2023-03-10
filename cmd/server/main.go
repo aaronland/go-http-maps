@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/aaronland/go-http-maps/app/server"	
+	"github.com/aaronland/go-http-maps/app/server"
 )
 
 func main() {
