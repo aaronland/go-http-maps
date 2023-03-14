@@ -1,6 +1,8 @@
 package maps
 
 import (
+	"log"
+	"io"
 	gohttp "net/http"
 
 	"github.com/aaronland/go-http-maps/provider"
@@ -16,11 +18,16 @@ type MapsOptions struct {
 	// AppendJavaScriptAtEOF is a boolean flag to append JavaScript markup at the end of an HTML document
 	// rather than in the <head> HTML element. Default is false
 	AppendJavaScriptAtEOF bool
+	RollupAssets          bool
+	Prefix                string
+	Logger                *log.Logger	
 }
 
 // Return a *MapsOptions struct with default paths and URIs.
 func DefaultMapsOptions() *MapsOptions {
 
+	logger := log.New(io.Discard, "", 0)
+	
 	opts := &MapsOptions{
 		CSS: []string{
 			"/css/aaronland.maps.css",
@@ -29,6 +36,7 @@ func DefaultMapsOptions() *MapsOptions {
 			"/javascript/aaronland.maps.js",
 		},
 		DataAttributes: make(map[string]string),
+		Logger: logger,
 	}
 
 	return opts

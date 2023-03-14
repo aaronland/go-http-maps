@@ -118,6 +118,12 @@ const JavaScriptAtEOFFlag string = "javascript-at-eof"
 // An optional boolean flag to indicate that JavaScript resources (<script> tags) should be appended to the end of the HTML output.
 var javascript_at_eof bool
 
+// The names of the commandline flag or query parameter used to assign the `rollup_assets` variable.
+const RollupAssetsFlag string = "rollup-assets"
+
+// An optional boolean flag to indicate that multiple JavaScript and CSS assets should be minified and combined in to single files.
+var rollup_assets bool
+
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	schemes := Schemes()
@@ -134,6 +140,8 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.BoolVar(&javascript_at_eof, JavaScriptAtEOFFlag, false, "An optional boolean flag to indicate that JavaScript resources (<script> tags) should be appended to the end of the HTML output.")
 
+	fs.BoolVar(&rollup_assets, RollupAssetsFlag, false, "An optional boolean flag to indicate that multiple JavaScript and CSS assets should be minified and combined in to single files.")
+	
 	err := AppendLeafletFlags(fs)
 
 	if err != nil {
@@ -215,6 +223,10 @@ func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 		q.Set(JavaScriptAtEOFFlag, strconv.FormatBool(javascript_at_eof))
 	}
 
+	if rollup_assets {
+		q.Set(RollupAssetsFlag, strconv.FormatBool(rollup_assets))
+	}
+	
 	switch map_provider {
 	case "leaflet":
 

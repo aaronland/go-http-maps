@@ -43,15 +43,13 @@ type ProtomapsProvider struct {
 }
 
 func init() {
-	protomaps.APPEND_LEAFLET_RESOURCES = false
-	protomaps.APPEND_LEAFLET_ASSETS = false
-
 	ctx := context.Background()
 	RegisterProvider(ctx, PROTOMAPS_SCHEME, NewProtomapsProvider)
 }
 
 func ProtomapsOptionsFromURL(u *url.URL) (*protomaps.ProtomapsOptions, error) {
 	opts := protomaps.DefaultProtomapsOptions()
+
 	return opts, nil
 }
 
@@ -68,13 +66,16 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create leaflet options, %w", err)
 	}
-
+	
 	protomaps_opts, err := ProtomapsOptionsFromURL(u)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create protomaps options, %w", err)
 	}
 
+	protomaps_opts.AppendLeafletResources = false
+	protomaps_opts.AppendLeafletAssets = false	
+	
 	protomaps_opts.JS = append(protomaps_opts.JS, pathRulesJavascript)
 
 	t, err := javascript.LoadTemplates(ctx)
@@ -105,12 +106,32 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		}
 
 		if v == true {
+			leaflet_opts.AppendJavaScriptAtEOF = true			
 			protomaps_opts.AppendJavaScriptAtEOF = true
 		}
 	}
 
+	q_rollup_assets := q.Get(RollupAssetsFlag)
+
+	if q_rollup_assets != "" {
+
+		v, err := strconv.ParseBool(q_rollup_assets)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to parse ?%s= parameter, %w", RollupAssetsFlag, err)
+		}
+
+		if v == true {
+			leaflet_opts.RollupAssets = true			
+			protomaps_opts.RollupAssets = true
+		}
+	}
+	
 	logger := log.New(io.Discard, "", 0)
 
+	protomaps_opts.Logger = logger
+	leaflet_opts.Logger = logger
+	
 	p := &ProtomapsProvider{
 		leafletOptions:   leaflet_opts,
 		protomapsOptions: protomaps_opts,
@@ -185,28 +206,20 @@ func (p *ProtomapsProvider) Scheme() string {
 }
 
 func (p *ProtomapsProvider) AppendResourcesHandler(handler http.Handler) http.Handler {
-	return p.AppendResourcesHandlerWithPrefix(handler, "")
-}
-
-func (p *ProtomapsProvider) AppendResourcesHandlerWithPrefix(handler http.Handler, prefix string) http.Handler {
-	handler = leaflet.AppendResourcesHandlerWithPrefix(handler, p.leafletOptions, prefix)
-	handler = protomaps.AppendResourcesHandlerWithPrefix(handler, p.protomapsOptions, prefix)
+	handler = leaflet.AppendResourcesHandler(handler, p.leafletOptions)
+	handler = protomaps.AppendResourcesHandler(handler, p.protomapsOptions)
 	return handler
 }
 
 func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
-	return p.AppendAssetHandlersWithPrefix(mux, "")
-}
 
-func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, prefix string) error {
-
-	err := leaflet.AppendAssetHandlersWithPrefix(mux, prefix)
+	err := leaflet.AppendAssetHandlers(mux, p.leafletOptions)
 
 	if err != nil {
 		return fmt.Errorf("Failed to append leaflet asset handler, %w", err)
 	}
 
-	err = protomaps.AppendAssetHandlersWithPrefix(mux, prefix)
+	err = protomaps.AppendAssetHandlers(mux, p.protomapsOptions)
 
 	if err != nil {
 		return fmt.Errorf("Failed to append protomaps asset handler, %w", err)
@@ -224,12 +237,12 @@ func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pr
 
 		path_tiles := p.path_tiles
 
-		if prefix != "" {
+		if p.protomapsOptions.Prefix != "" {
 
-			path_tiles, err = url.JoinPath(prefix, path_tiles)
+			path_tiles, err = url.JoinPath(p.protomapsOptions.Prefix, path_tiles)
 
 			if err != nil {
-				return fmt.Errorf("Failed to join path with %s and %s", prefix, path_tiles)
+				return fmt.Errorf("Failed to join path with %s and %s", p.protomapsOptions.Prefix, path_tiles)
 			}
 		}
 
@@ -257,7 +270,7 @@ func (p *ProtomapsProvider) AppendAssetHandlersWithPrefix(mux *http.ServeMux, pr
 		p.protomapsOptions.TileURL = pm_tile_url
 	}
 
-	err = p.appendRulesAssetHandlers(mux, prefix)
+	err = p.appendRulesAssetHandlers(mux, p.protomapsOptions)
 
 	if err != nil {
 		return fmt.Errorf("Failed to assign rules asset handlers, %w", err)
@@ -271,7 +284,7 @@ func (p *ProtomapsProvider) SetLogger(logger *log.Logger) error {
 	return nil
 }
 
-func (p *ProtomapsProvider) appendRulesAssetHandlers(mux *http.ServeMux, prefix string) error {
+func (p *ProtomapsProvider) appendRulesAssetHandlers(mux *http.ServeMux, opts *protomaps.ProtomapsOptions) error {
 
 	rules_handler, err := p.rulesHandler()
 
@@ -281,9 +294,9 @@ func (p *ProtomapsProvider) appendRulesAssetHandlers(mux *http.ServeMux, prefix 
 
 	path_rules := pathRulesJavascript
 
-	if prefix != "" {
+	if opts.Prefix != "" {
 
-		path, err := url.JoinPath(prefix, path_rules)
+		path, err := url.JoinPath(opts.Prefix, path_rules)
 
 		if err != nil {
 			return fmt.Errorf("Failed to join path for paint rules, %w", err)
