@@ -4,18 +4,19 @@ go 1.18
 
 require (
 	github.com/aaronland/go-http-bootstrap v0.3.0
-	github.com/aaronland/go-http-leaflet v0.3.0
+	github.com/aaronland/go-http-leaflet v0.4.0
 	github.com/aaronland/go-http-server v1.0.1
 	github.com/aaronland/go-http-static v0.0.3
-	github.com/aaronland/go-http-tangramjs v0.2.0
+	github.com/aaronland/go-http-tangramjs v0.3.0
 	github.com/aaronland/go-roster v1.0.0
 	github.com/protomaps/go-pmtiles v1.7.0
 	github.com/sfomuseum/go-flags v0.10.0
-	github.com/sfomuseum/go-http-protomaps v0.1.0
+	github.com/sfomuseum/go-http-protomaps v0.2.0
 	github.com/sfomuseum/go-http-rollup v0.0.2
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.1.0
 	github.com/sfomuseum/go-template v1.5.1
 	github.com/sfomuseum/runtimevar v1.0.4
+	github.com/tdewolff/minify/v2 v2.12.4
 	github.com/tilezen/go-tilepacks v0.0.0-20230304224913-9d1d60a55bc6
 	gocloud.dev v0.29.0
 )
@@ -60,7 +61,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/schollz/progressbar/v3 v3.11.0 // indirect
-	github.com/tdewolff/minify/v2 v2.12.4 // indirect
 	github.com/tdewolff/parse/v2 v2.6.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.8.0 // indirect

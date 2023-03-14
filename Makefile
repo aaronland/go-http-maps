@@ -1,9 +1,9 @@
 CWD=$(shell pwd)
 
-GOMOD=readonly
+GOMOD=vendor
 
 cli:
-	go build -o bin/server cmd/server/main.go
+	go build -ldflags="-s -w" -o bin/server cmd/server/main.go
 
 debug-tangram:
 	go run -mod $(GOMOD) cmd/server/main.go \
