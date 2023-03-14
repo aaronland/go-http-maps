@@ -1,9 +1,13 @@
 package maps
 
 import (
+	"fmt"
 	"io"
+	"io/fs"
 	"log"
-	gohttp "net/http"
+	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/static"
@@ -43,14 +47,14 @@ func DefaultMapsOptions() *MapsOptions {
 	return opts
 }
 
-func AppendResourcesHandlerWithProvider(next gohttp.Handler, map_provider provider.Provider, maps_opts *MapsOptions) gohttp.Handler {
+func AppendResourcesHandlerWithProvider(next http.Handler, map_provider provider.Provider, maps_opts *MapsOptions) http.Handler {
 	next = map_provider.AppendResourcesHandler(next)
 	next = AppendResourcesHandler(next, maps_opts)
 	return next
 }
 
 // AppendResourcesHandler will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript and CSS files and related assets.
-func AppendResourcesHandler(next gohttp.Handler, opts *MapsOptions) gohttp.Handler {
+func AppendResourcesHandler(next http.Handler, opts *MapsOptions) http.Handler {
 
 	static_opts := aa_static.DefaultResourcesOptions()
 	static_opts.AppendJavaScriptAtEOF = opts.AppendJavaScriptAtEOF
@@ -75,17 +79,17 @@ func AppendResourcesHandler(next gohttp.Handler, opts *MapsOptions) gohttp.Handl
 
 	static_opts.JS = js_uris
 	static_opts.CSS = css_uris
-	
+
 	return aa_static.AppendResourcesHandlerWithPrefix(next, static_opts, opts.Prefix)
 }
 
 // Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance.
-func AppendAssetHandlers(mux *gohttp.ServeMux, opts *MapsOptions) error {
+func AppendAssetHandlers(mux *http.ServeMux, opts *MapsOptions) error {
 
-	if !opts.RollupAssets {	
+	if !opts.RollupAssets {
 		return aa_static.AppendStaticAssetHandlersWithPrefix(mux, static.FS, opts.Prefix)
 	}
-	
+
 	// START OF this should eventually be made a generic function in go-http-rollup
 
 	js_paths := make([]string, len(opts.JS))
@@ -197,7 +201,7 @@ func AppendAssetHandlers(mux *gohttp.ServeMux, opts *MapsOptions) error {
 	return nil
 }
 
-func serveSubDir(mux *http.ServeMux, opts *TangramJSOptions, dirname string) error {
+func serveSubDir(mux *http.ServeMux, opts *MapsOptions, dirname string) error {
 
 	sub_fs, err := fs.Sub(static.FS, dirname)
 
@@ -226,4 +230,3 @@ func serveSubDir(mux *http.ServeMux, opts *TangramJSOptions, dirname string) err
 
 	return nil
 }
-

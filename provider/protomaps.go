@@ -11,16 +11,20 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
 
 	"github.com/aaronland/go-http-leaflet"
 	"github.com/aaronland/go-http-maps/templates/javascript"
+	aa_static "github.com/aaronland/go-http-static"
 	"github.com/protomaps/go-pmtiles/pmtiles"
 	"github.com/sfomuseum/go-http-protomaps"
 	pmhttp "github.com/sfomuseum/go-sfomuseum-pmtiles/http"
 	"github.com/sfomuseum/runtimevar"
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/js"
 )
 
 const PROTOMAPS_SCHEME string = "protomaps"
@@ -120,8 +124,6 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 	protomaps_opts.AppendLeafletResources = false
 	protomaps_opts.AppendLeafletAssets = false
 
-	protomaps_opts.JS = append(protomaps_opts.JS, pathRulesJavascript)
-
 	t, err := javascript.LoadTemplates(ctx)
 
 	if err != nil {
@@ -215,8 +217,18 @@ func (p *ProtomapsProvider) Scheme() string {
 }
 
 func (p *ProtomapsProvider) AppendResourcesHandler(handler http.Handler) http.Handler {
+
 	handler = leaflet.AppendResourcesHandler(handler, p.leafletOptions)
 	handler = protomaps.AppendResourcesHandler(handler, p.protomapsOptions)
+
+	// Finally add the custom paint/label rules. These are served by the
+	// rulesHandler() method below.
+
+	static_opts := aa_static.DefaultResourcesOptions()
+	static_opts.AppendJavaScriptAtEOF = p.protomapsOptions.AppendJavaScriptAtEOF
+	static_opts.JS = []string{pathRulesJavascript}
+
+	return aa_static.AppendResourcesHandlerWithPrefix(handler, static_opts, p.protomapsOptions.Prefix)
 	return handler
 }
 
@@ -290,6 +302,8 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 
 func (p *ProtomapsProvider) SetLogger(logger *log.Logger) error {
 	p.logger = logger
+	p.protomapsOptions.Logger = logger
+	p.leafletOptions.Logger = logger	
 	return nil
 }
 
@@ -300,6 +314,24 @@ func (p *ProtomapsProvider) appendRulesAssetHandlers(mux *http.ServeMux, opts *p
 	if err != nil {
 		return fmt.Errorf("Failed to create rules handler, %w", err)
 	}
+
+	// START OF middleware to minify rules
+
+	if opts.RollupAssets {
+
+		js_regexp, err := regexp.Compile("^(application|text)/(x-)?(java|ecma)script$")
+
+		if err != nil {
+			return fmt.Errorf("Failed to compile JS pattern for minifier, %w", err)
+		}
+
+		m := minify.New()
+		m.AddFuncRegexp(js_regexp, js.Minify)
+
+		rules_handler = m.Middleware(rules_handler)
+	}
+
+	// END OF middleware to minify rules
 
 	path_rules := pathRulesJavascript
 
