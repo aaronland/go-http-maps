@@ -35,9 +35,6 @@ func TangramJSOptionsFromURL(u *url.URL) (*tangramjs.TangramJSOptions, error) {
 
 	opts := tangramjs.DefaultTangramJSOptions()
 
-	opts.AppendLeafletResources = false
-	opts.AppendLeafletAssets = false	
-	
 	q := u.Query()
 
 	opts.NextzenOptions.APIKey = q.Get("nextzen-apikey")
@@ -80,10 +77,16 @@ func TangramJSOptionsFromURL(u *url.URL) (*tangramjs.TangramJSOptions, error) {
 		}
 
 		if v == true {
-			opts.RollupAssets = true			
+			opts.RollupAssets = true
 		}
 	}
-	
+
+	q_map_prefix := q.Get(MapPrefixFlag)
+
+	if q_map_prefix != "" {
+		opts.Prefix = q_map_prefix
+	}
+
 	return opts, nil
 }
 
@@ -107,6 +110,9 @@ func NewTangramProvider(ctx context.Context, uri string) (Provider, error) {
 		return nil, fmt.Errorf("Failed to create tilezen options, %w", err)
 	}
 
+	tangram_opts.AppendLeafletResources = false
+	tangram_opts.AppendLeafletAssets = false
+
 	tilezen_opts, err := TilezenOptionsFromURL(u)
 
 	if err != nil {
@@ -116,12 +122,8 @@ func NewTangramProvider(ctx context.Context, uri string) (Provider, error) {
 	logger := log.New(io.Discard, "", 0)
 
 	tangram_opts.Logger = logger
-
-	leaflet_opts.AppendJavaScriptAtEOF = tangram_opts.AppendJavaScriptAtEOF	
-	leaflet_opts.RollupAssets = tangram_opts.RollupAssets
-	leaflet_opts.Prefix = tangram_opts.Prefix
 	leaflet_opts.Logger = logger
-	
+
 	p := &TangramProvider{
 		leafletOptions: leaflet_opts,
 		tangramOptions: tangram_opts,

@@ -1,8 +1,8 @@
 package maps
 
 import (
-	"log"
 	"io"
+	"log"
 	gohttp "net/http"
 
 	"github.com/aaronland/go-http-maps/provider"
@@ -20,14 +20,14 @@ type MapsOptions struct {
 	AppendJavaScriptAtEOF bool
 	RollupAssets          bool
 	Prefix                string
-	Logger                *log.Logger	
+	Logger                *log.Logger
 }
 
 // Return a *MapsOptions struct with default paths and URIs.
 func DefaultMapsOptions() *MapsOptions {
 
 	logger := log.New(io.Discard, "", 0)
-	
+
 	opts := &MapsOptions{
 		CSS: []string{
 			"/css/aaronland.maps.css",
@@ -36,41 +36,31 @@ func DefaultMapsOptions() *MapsOptions {
 			"/javascript/aaronland.maps.js",
 		},
 		DataAttributes: make(map[string]string),
-		Logger: logger,
+		Logger:         logger,
 	}
 
 	return opts
 }
 
-func AppendResourcesHandlerWithPrefixAndProvider(next gohttp.Handler, map_provider provider.Provider, maps_opts *MapsOptions, prefix string) gohttp.Handler {
-	next = map_provider.AppendResourcesHandlerWithPrefix(next, prefix)
-	next = AppendResourcesHandlerWithPrefix(next, maps_opts, prefix)
+func AppendResourcesHandlerWithProvider(next gohttp.Handler, map_provider provider.Provider, maps_opts *MapsOptions) gohttp.Handler {
+	next = map_provider.AppendResourcesHandler(next)
+	next = AppendResourcesHandler(next, maps_opts)
 	return next
 }
 
 // AppendResourcesHandler will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript and CSS files and related assets.
 func AppendResourcesHandler(next gohttp.Handler, opts *MapsOptions) gohttp.Handler {
-	return AppendResourcesHandlerWithPrefix(next, opts, "")
-}
-
-// AppendResourcesHandlerWithPrefix will rewrite any HTML produced by previous handler to include the necessary markup to load Maps JavaScript files and related assets ensuring that all URIs are prepended with a prefix.
-func AppendResourcesHandlerWithPrefix(next gohttp.Handler, opts *MapsOptions, prefix string) gohttp.Handler {
 
 	static_opts := aa_static.DefaultResourcesOptions()
 	static_opts.CSS = opts.CSS
 	static_opts.JS = opts.JS
 	static_opts.AppendJavaScriptAtEOF = opts.AppendJavaScriptAtEOF
 
-	return aa_static.AppendResourcesHandlerWithPrefix(next, static_opts, prefix)
+	return aa_static.AppendResourcesHandlerWithPrefix(next, static_opts, opts.Prefix)
 }
 
 // Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance.
-func AppendAssetHandlers(mux *gohttp.ServeMux) error {
-	return AppendAssetHandlersWithPrefix(mux, "")
-}
+func AppendAssetHandlers(mux *gohttp.ServeMux, opts *MapsOptions) error {
 
-// Append all the files in the net/http FS instance containing the embedded Maps assets to an *http.ServeMux instance ensuring that all URLs are prepended with prefix.
-func AppendAssetHandlersWithPrefix(mux *gohttp.ServeMux, prefix string) error {
-
-	return aa_static.AppendStaticAssetHandlersWithPrefix(mux, static.FS, prefix)
+	return aa_static.AppendStaticAssetHandlersWithPrefix(mux, static.FS, opts.Prefix)
 }

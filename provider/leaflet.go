@@ -61,7 +61,13 @@ func LeafletOptionsFromURL(u *url.URL) (*leaflet.LeafletOptions, error) {
 			opts.RollupAssets = true
 		}
 	}
-	
+
+	q_map_prefix := q.Get(MapPrefixFlag)
+
+	if q_map_prefix != "" {
+		opts.Prefix = q_map_prefix
+	}
+
 	q_enable_hash := q.Get("leaflet-enable-hash")
 
 	if q_enable_hash != "" {
@@ -133,7 +139,7 @@ func NewLeafletProvider(ctx context.Context, uri string) (Provider, error) {
 	logger := log.New(io.Discard, "", 0)
 
 	leaflet_opts.Logger = logger
-	
+
 	p := &LeafletProvider{
 		leafletOptions: leaflet_opts,
 		logger:         logger,

@@ -124,6 +124,10 @@ const RollupAssetsFlag string = "rollup-assets"
 // An optional boolean flag to indicate that multiple JavaScript and CSS assets should be minified and combined in to single files.
 var rollup_assets bool
 
+const MapPrefixFlag string = "map-prefix"
+
+var map_prefix string
+
 func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	schemes := Schemes()
@@ -138,10 +142,12 @@ func AppendProviderFlags(fs *flag.FlagSet) error {
 
 	fs.StringVar(&map_provider, MapProviderFlag, "", map_provider_desc)
 
+	fs.StringVar(&map_prefix, MapPrefixFlag, "", "...")
+
 	fs.BoolVar(&javascript_at_eof, JavaScriptAtEOFFlag, false, "An optional boolean flag to indicate that JavaScript resources (<script> tags) should be appended to the end of the HTML output.")
 
 	fs.BoolVar(&rollup_assets, RollupAssetsFlag, false, "An optional boolean flag to indicate that multiple JavaScript and CSS assets should be minified and combined in to single files.")
-	
+
 	err := AppendLeafletFlags(fs)
 
 	if err != nil {
@@ -226,7 +232,9 @@ func ProviderURIFromFlagSet(fs *flag.FlagSet) (string, error) {
 	if rollup_assets {
 		q.Set(RollupAssetsFlag, strconv.FormatBool(rollup_assets))
 	}
-	
+
+	q.Set(MapPrefixFlag, map_prefix)
+
 	switch map_provider {
 	case "leaflet":
 

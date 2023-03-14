@@ -48,52 +48,10 @@ func init() {
 }
 
 func ProtomapsOptionsFromURL(u *url.URL) (*protomaps.ProtomapsOptions, error) {
+
 	opts := protomaps.DefaultProtomapsOptions()
 
-	return opts, nil
-}
-
-func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
-
-	u, err := url.Parse(uri)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse URI, %w", err)
-	}
-
-	leaflet_opts, err := LeafletOptionsFromURL(u)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create leaflet options, %w", err)
-	}
-	
-	protomaps_opts, err := ProtomapsOptionsFromURL(u)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create protomaps options, %w", err)
-	}
-
-	protomaps_opts.AppendLeafletResources = false
-	protomaps_opts.AppendLeafletAssets = false	
-	
-	protomaps_opts.JS = append(protomaps_opts.JS, pathRulesJavascript)
-
-	t, err := javascript.LoadTemplates(ctx)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to load Javascript templates, %w", err)
-	}
-
-	rules_t := t.Lookup("rules")
-
-	if t == nil {
-		return nil, fmt.Errorf("Missing 'rules' Javascript template")
-	}
-
 	q := u.Query()
-
-	q_tile_url := q.Get(ProtomapsTileURLFlag)
-	protomaps_opts.TileURL = q_tile_url
 
 	q_javascript_at_eof := q.Get(JavaScriptAtEOFFlag)
 
@@ -106,8 +64,7 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		}
 
 		if v == true {
-			leaflet_opts.AppendJavaScriptAtEOF = true			
-			protomaps_opts.AppendJavaScriptAtEOF = true
+			opts.AppendJavaScriptAtEOF = true
 		}
 	}
 
@@ -122,16 +79,66 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		}
 
 		if v == true {
-			leaflet_opts.RollupAssets = true			
-			protomaps_opts.RollupAssets = true
+			opts.RollupAssets = true
 		}
 	}
-	
+
+	q_map_prefix := q.Get(MapPrefixFlag)
+
+	if q_map_prefix != "" {
+		opts.Prefix = q_map_prefix
+	}
+
+	q_tile_url := q.Get(ProtomapsTileURLFlag)
+	opts.TileURL = q_tile_url
+
+	return opts, nil
+}
+
+func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
+
+	u, err := url.Parse(uri)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse URI, %w", err)
+	}
+
+	q := u.Query()
+
+	leaflet_opts, err := LeafletOptionsFromURL(u)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create leaflet options, %w", err)
+	}
+
+	protomaps_opts, err := ProtomapsOptionsFromURL(u)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create protomaps options, %w", err)
+	}
+
+	protomaps_opts.AppendLeafletResources = false
+	protomaps_opts.AppendLeafletAssets = false
+
+	protomaps_opts.JS = append(protomaps_opts.JS, pathRulesJavascript)
+
+	t, err := javascript.LoadTemplates(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load Javascript templates, %w", err)
+	}
+
+	rules_t := t.Lookup("rules")
+
+	if t == nil {
+		return nil, fmt.Errorf("Missing 'rules' Javascript template")
+	}
+
 	logger := log.New(io.Discard, "", 0)
 
 	protomaps_opts.Logger = logger
 	leaflet_opts.Logger = logger
-	
+
 	p := &ProtomapsProvider{
 		leafletOptions:   leaflet_opts,
 		protomapsOptions: protomaps_opts,
@@ -190,6 +197,8 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Failed to parse ?%s= parameter, %w", ProtomapsCacheSizeFlag, err)
 		}
+
+		q_tile_url := q.Get(ProtomapsTileURLFlag)
 
 		p.cache_size = sz
 		p.bucket_uri = q_bucket_uri
