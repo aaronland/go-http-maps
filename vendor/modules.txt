@@ -27,6 +27,9 @@ github.com/aaronland/go-http-static
 ## explicit; go 1.18
 github.com/aaronland/go-http-tangramjs
 github.com/aaronland/go-http-tangramjs/static
+# github.com/aaronland/go-log/v2 v2.0.0
+## explicit; go 1.18
+github.com/aaronland/go-log/v2
 # github.com/aaronland/go-roster v1.0.0
 ## explicit; go 1.16
 github.com/aaronland/go-roster
@@ -267,6 +270,9 @@ github.com/sfomuseum/go-flags/multi
 ## explicit; go 1.18
 github.com/sfomuseum/go-http-protomaps
 github.com/sfomuseum/go-http-protomaps/static
+# github.com/sfomuseum/go-http-rollup v0.0.2
+## explicit; go 1.20
+github.com/sfomuseum/go-http-rollup
 # github.com/sfomuseum/go-sfomuseum-pmtiles v1.1.0
 ## explicit; go 1.19
 github.com/sfomuseum/go-sfomuseum-pmtiles/http
@@ -278,6 +284,18 @@ github.com/sfomuseum/go-template/text
 # github.com/sfomuseum/runtimevar v1.0.4
 ## explicit; go 1.18
 github.com/sfomuseum/runtimevar
+# github.com/tdewolff/minify/v2 v2.12.4
+## explicit; go 1.13
+github.com/tdewolff/minify/v2
+github.com/tdewolff/minify/v2/css
+github.com/tdewolff/minify/v2/js
+# github.com/tdewolff/parse/v2 v2.6.4
+## explicit; go 1.13
+github.com/tdewolff/parse/v2
+github.com/tdewolff/parse/v2/buffer
+github.com/tdewolff/parse/v2/css
+github.com/tdewolff/parse/v2/js
+github.com/tdewolff/parse/v2/strconv
 # github.com/tilezen/go-tilepacks v0.0.0-20230304224913-9d1d60a55bc6
 ## explicit; go 1.12
 github.com/tilezen/go-tilepacks/http

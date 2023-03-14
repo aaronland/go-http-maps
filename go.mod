@@ -12,6 +12,7 @@ require (
 	github.com/protomaps/go-pmtiles v1.7.0
 	github.com/sfomuseum/go-flags v0.10.0
 	github.com/sfomuseum/go-http-protomaps v0.1.0
+	github.com/sfomuseum/go-http-rollup v0.0.2
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.1.0
 	github.com/sfomuseum/go-template v1.5.1
 	github.com/sfomuseum/runtimevar v1.0.4
@@ -23,6 +24,7 @@ require (
 	github.com/RoaringBitmap/roaring v1.2.1 // indirect
 	github.com/aaronland/go-aws-session v0.1.0 // indirect
 	github.com/aaronland/go-http-rewrite v1.1.0 // indirect
+	github.com/aaronland/go-log/v2 v2.0.0 // indirect
 	github.com/aaronland/go-string v1.0.0 // indirect
 	github.com/akrylysov/algnhsa v1.0.0 // indirect
 	github.com/aws/aws-lambda-go v1.37.0 // indirect
@@ -58,6 +60,8 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/schollz/progressbar/v3 v3.11.0 // indirect
+	github.com/tdewolff/minify/v2 v2.12.4 // indirect
+	github.com/tdewolff/parse/v2 v2.6.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
