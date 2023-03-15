@@ -303,7 +303,7 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 func (p *ProtomapsProvider) SetLogger(logger *log.Logger) error {
 	p.logger = logger
 	p.protomapsOptions.Logger = logger
-	p.leafletOptions.Logger = logger	
+	p.leafletOptions.Logger = logger
 	return nil
 }
 

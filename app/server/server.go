@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/aaronland/go-http-bootstrap"
+	"github.com/aaronland/go-http-maps"
 	"github.com/aaronland/go-http-maps/http/www"
 	"github.com/aaronland/go-http-maps/provider"
 	"github.com/aaronland/go-http-maps/templates/html"
@@ -35,6 +36,12 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 
 	if err != nil {
 		return fmt.Errorf("Failed to lookup %s flag, %w", provider.JavaScriptAtEOFFlag, err)
+	}
+
+	rollup_assets, err := lookup.BoolVar(fs, provider.RollupAssetsFlag)
+
+	if err != nil {
+		return fmt.Errorf("Failed to lookup %s flag, %w", provider.RollupAssetsFlag, err)
 	}
 
 	t, err := html.LoadTemplates(ctx)
@@ -69,7 +76,11 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 		return fmt.Errorf("Failed to append Bootstrap asset handlers, %v")
 	}
 
-	err = www.AppendStaticAssetHandlers(mux)
+	maps_opts := maps.DefaultMapsOptions()
+	maps_opts.RollupAssets = rollup_assets
+	maps_opts.AppendJavaScriptAtEOF = js_at_eof
+
+	err = maps.AppendAssetHandlers(mux, maps_opts)
 
 	if err != nil {
 		return fmt.Errorf("Failed to append static asset handlers, %v")
@@ -81,7 +92,7 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 		return fmt.Errorf("Failed to append provider asset handlers, %v", err)
 	}
 
-	map_opts := &www.MapHandlerOptions{
+	map_www_opts := &www.MapHandlerOptions{
 		Templates:        t,
 		MapProvider:      pr,
 		InitialLatitude:  initial_latitude,
@@ -89,7 +100,7 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 		InitialZoom:      initial_zoom,
 	}
 
-	map_handler, err := www.MapHandler(map_opts)
+	map_www_handler, err := www.MapHandler(map_www_opts)
 
 	if err != nil {
 		return fmt.Errorf("Failed to create map handler, %v", err)
@@ -98,10 +109,10 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
 	bootstrap_opts.AppendJavaScriptAtEOF = js_at_eof
 
-	map_handler = bootstrap.AppendResourcesHandler(map_handler, bootstrap_opts)
+	map_www_handler = bootstrap.AppendResourcesHandler(map_www_handler, bootstrap_opts)
 
-	map_handler = pr.AppendResourcesHandler(map_handler)
-	mux.Handle("/", map_handler)
+	map_www_handler = pr.AppendResourcesHandler(map_www_handler)
+	mux.Handle("/", map_www_handler)
 
 	//
 
