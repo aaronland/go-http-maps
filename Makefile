@@ -39,3 +39,9 @@ debug-leaflet:
 	-leaflet-enable-draw \
 	-javascript-at-eof \
 	-rollup-assets
+
+debug-null:
+	go run -mod $(GOMOD) cmd/server/main.go \
+	-map-provider null \
+	-javascript-at-eof \
+	-rollup-assets
