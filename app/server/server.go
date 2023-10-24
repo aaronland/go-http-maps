@@ -67,10 +67,13 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 	if err != nil {
 		return fmt.Errorf("Failed to set logger for provider, %w", err)
 	}
-
+	
 	mux := http.NewServeMux()
 
-	err = bootstrap.AppendAssetHandlers(mux)
+	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
+	bootstrap_opts.AppendJavaScriptAtEOF = js_at_eof
+	
+	err = bootstrap.AppendAssetHandlers(mux, bootstrap_opts)
 
 	if err != nil {
 		return fmt.Errorf("Failed to append Bootstrap asset handlers, %v")
@@ -105,9 +108,6 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 	if err != nil {
 		return fmt.Errorf("Failed to create map handler, %v", err)
 	}
-
-	bootstrap_opts := bootstrap.DefaultBootstrapOptions()
-	bootstrap_opts.AppendJavaScriptAtEOF = js_at_eof
 
 	map_www_handler = bootstrap.AppendResourcesHandler(map_www_handler, bootstrap_opts)
 
