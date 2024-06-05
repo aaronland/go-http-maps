@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,7 +15,6 @@ const LEAFLET_SCHEME string = "leaflet"
 type LeafletProvider struct {
 	Provider
 	leafletOptions *leaflet.LeafletOptions
-	logger         *log.Logger
 }
 
 func init() {
@@ -159,10 +157,5 @@ func (p *LeafletProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 		return fmt.Errorf("Failed to append leaflet asset handler, %w", err)
 	}
 
-	return nil
-}
-
-func (p *LeafletProvider) SetLogger(logger *log.Logger) error {
-	p.logger = logger
 	return nil
 }

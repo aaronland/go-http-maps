@@ -7,7 +7,7 @@ import (
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -37,7 +37,6 @@ type ProtomapsProvider struct {
 	paintRules       string
 	labelRules       string
 	rulesTemplate    *template.Template
-	logger           *log.Logger
 	serve_tiles      bool
 	cache_size       int
 	bucket_uri       string
@@ -241,7 +240,10 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 
 	if p.serve_tiles {
 
-		loop, err := pmtiles.NewServer(p.bucket_uri, "", p.logger, p.cache_size, "", "")
+		logger := slog.Default()
+		log_logger := slog.NewLogLogger(logger.Handler(), slog.LevelError)
+
+		loop, err := pmtiles.NewServer(p.bucket_uri, "", log_logger, p.cache_size, "", "")
 
 		if err != nil {
 			return fmt.Errorf("Failed to create pmtiles.Loop, %w", err)
@@ -260,7 +262,7 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 			}
 		}
 
-		pmtiles_handler := pmhttp.TileHandler(loop, p.logger)
+		pmtiles_handler := pmhttp.TileHandler(loop, log_logger)
 
 		strip_path := strings.TrimRight(path_tiles, "/")
 		pmtiles_handler = http.StripPrefix(strip_path, pmtiles_handler)
