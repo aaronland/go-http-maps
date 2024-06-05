@@ -1,21 +1,21 @@
 module github.com/aaronland/go-http-maps
 
-go 1.22.3
+go 1.22.4
 
 require (
-	github.com/aaronland/go-http-bootstrap v0.4.0
-	github.com/aaronland/go-http-leaflet v0.4.3
+	github.com/aaronland/go-http-bootstrap v0.5.0
+	github.com/aaronland/go-http-leaflet v0.5.0
 	github.com/aaronland/go-http-server v1.4.1
 	github.com/aaronland/go-http-static v0.0.3
 	github.com/aaronland/go-roster v1.0.0
-	github.com/protomaps/go-pmtiles v1.19.1
+	github.com/protomaps/go-pmtiles v1.19.2
 	github.com/sfomuseum/go-flags v0.10.0
-	github.com/sfomuseum/go-http-protomaps v0.2.0
-	github.com/sfomuseum/go-http-rollup v0.0.2
+	github.com/sfomuseum/go-http-protomaps v0.3.0
+	github.com/sfomuseum/go-http-rollup v0.0.3
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.4.1
 	github.com/sfomuseum/go-template v1.10.0
 	github.com/sfomuseum/runtimevar v1.2.0
-	github.com/tdewolff/minify/v2 v2.20.23
+	github.com/tdewolff/minify/v2 v2.20.32
 	gocloud.dev v0.37.0
 )
 
@@ -23,7 +23,6 @@ require (
 	github.com/RoaringBitmap/roaring v1.5.0 // indirect
 	github.com/aaronland/go-aws-auth v1.3.1 // indirect
 	github.com/aaronland/go-http-rewrite v1.1.0 // indirect
-	github.com/aaronland/go-log/v2 v2.0.0 // indirect
 	github.com/akrylysov/algnhsa v1.1.0 // indirect
 	github.com/aws/aws-lambda-go v1.46.0 // indirect
 	github.com/aws/aws-sdk-go v1.50.36 // indirect

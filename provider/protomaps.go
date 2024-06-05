@@ -7,7 +7,6 @@ import (
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -136,15 +135,9 @@ func NewProtomapsProvider(ctx context.Context, uri string) (Provider, error) {
 		return nil, fmt.Errorf("Missing 'rules' Javascript template")
 	}
 
-	logger := log.New(io.Discard, "", 0)
-
-	protomaps_opts.Logger = logger
-	leaflet_opts.Logger = logger
-
 	p := &ProtomapsProvider{
 		leafletOptions:   leaflet_opts,
 		protomapsOptions: protomaps_opts,
-		logger:           logger,
 		rulesTemplate:    rules_t,
 	}
 
@@ -297,13 +290,6 @@ func (p *ProtomapsProvider) AppendAssetHandlers(mux *http.ServeMux) error {
 		return fmt.Errorf("Failed to assign rules asset handlers, %w", err)
 	}
 
-	return nil
-}
-
-func (p *ProtomapsProvider) SetLogger(logger *log.Logger) error {
-	p.logger = logger
-	p.protomapsOptions.Logger = logger
-	p.leafletOptions.Logger = logger
 	return nil
 }
 

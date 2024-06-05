@@ -6,12 +6,12 @@ github.com/RoaringBitmap/roaring/roaring64
 # github.com/aaronland/go-aws-auth v1.3.1
 ## explicit; go 1.18
 github.com/aaronland/go-aws-auth
-# github.com/aaronland/go-http-bootstrap v0.4.0
-## explicit; go 1.18
+# github.com/aaronland/go-http-bootstrap v0.5.0
+## explicit; go 1.22.4
 github.com/aaronland/go-http-bootstrap
 github.com/aaronland/go-http-bootstrap/static
-# github.com/aaronland/go-http-leaflet v0.4.3
-## explicit; go 1.18
+# github.com/aaronland/go-http-leaflet v0.5.0
+## explicit; go 1.22.4
 github.com/aaronland/go-http-leaflet
 github.com/aaronland/go-http-leaflet/static
 # github.com/aaronland/go-http-rewrite v1.1.0
@@ -23,9 +23,6 @@ github.com/aaronland/go-http-server
 # github.com/aaronland/go-http-static v0.0.3
 ## explicit; go 1.18
 github.com/aaronland/go-http-static
-# github.com/aaronland/go-log/v2 v2.0.0
-## explicit; go 1.18
-github.com/aaronland/go-log/v2
 # github.com/aaronland/go-roster v1.0.0
 ## explicit; go 1.16
 github.com/aaronland/go-roster
@@ -287,7 +284,7 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
-# github.com/protomaps/go-pmtiles v1.19.1
+# github.com/protomaps/go-pmtiles v1.19.2
 ## explicit; go 1.21
 github.com/protomaps/go-pmtiles/pmtiles
 # github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
@@ -304,12 +301,12 @@ github.com/schollz/progressbar/v3
 github.com/sfomuseum/go-flags/flagset
 github.com/sfomuseum/go-flags/lookup
 github.com/sfomuseum/go-flags/multi
-# github.com/sfomuseum/go-http-protomaps v0.2.0
-## explicit; go 1.18
+# github.com/sfomuseum/go-http-protomaps v0.3.0
+## explicit; go 1.22.4
 github.com/sfomuseum/go-http-protomaps
 github.com/sfomuseum/go-http-protomaps/static
-# github.com/sfomuseum/go-http-rollup v0.0.2
-## explicit; go 1.20
+# github.com/sfomuseum/go-http-rollup v0.0.3
+## explicit; go 1.22.4
 github.com/sfomuseum/go-http-rollup
 # github.com/sfomuseum/go-sfomuseum-pmtiles v1.4.1
 ## explicit; go 1.22.2
@@ -327,7 +324,7 @@ github.com/sfomuseum/runtimevar
 github.com/skip2/go-qrcode
 github.com/skip2/go-qrcode/bitset
 github.com/skip2/go-qrcode/reedsolomon
-# github.com/tdewolff/minify/v2 v2.20.23
+# github.com/tdewolff/minify/v2 v2.20.32
 ## explicit; go 1.18
 github.com/tdewolff/minify/v2
 github.com/tdewolff/minify/v2/css
