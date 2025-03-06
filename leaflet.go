@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const LEAFLET_OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+
 // LeafletStyle is a struct containing details for decorating GeoJSON features and markers
 type LeafletStyle struct {
 	Color       string  `json:"color,omitempty"`
