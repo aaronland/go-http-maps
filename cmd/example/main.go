@@ -6,8 +6,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"net/url"
-	"strings"
 
 	"github.com/aaronland/go-http-maps/v2"
 	"github.com/aaronland/go-http-maps/v2/static/www"
@@ -20,6 +18,8 @@ func main() {
 	var host string
 	var port int
 
+	var initial_view string
+
 	var map_provider string
 	var map_tile_uri string
 	var protomaps_theme string
@@ -27,15 +27,15 @@ func main() {
 	var leaflet_style string
 	var leaflet_point_style string
 
-	flag.StringVar(&host, "host", "localhost", "The host to listen for requests on")
-	flag.IntVar(&port, "port", 8080, "The port number to listen for requests on")
 	flag.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
 	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
 	flag.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
-
 	flag.StringVar(&leaflet_style, "leaflet_style", "", "A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.")
 	flag.StringVar(&leaflet_point_style, "leaflet_point_style", "", "A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.")
+	flag.StringVar(&initial_view, "initial-view", "", "A comma-separated string indicating the map's initial view. Valid options are: 'LON,LAT', 'LON,LAT,ZOOM' or 'MINX,MINY,MAXX,MAXY'.")
 
+	flag.StringVar(&host, "host", "localhost", "The host to listen for requests on")
+	flag.IntVar(&port, "port", 8080, "The port number to listen for requests on")
 	flag.BoolVar(&verbose, "verbose", false, "Enable verbose (debug) logging.")
 
 	flag.Parse()
@@ -45,78 +45,22 @@ func main() {
 		slog.Debug("Verbose logging enabled")
 	}
 
-	// ctx := context.Background()
-
 	mux := http.NewServeMux()
 
-	map_cfg := &maps.MapConfig{
-		Provider: map_provider,
-		TileURL:  map_tile_uri,
+	opts := &maps.AssignMapConfigHandlerOptions{
+		MapProvider:       map_provider,
+		MapTileURI:        map_tile_uri,
+		InitialView:       initial_view,
+		LeafletStyle:      leaflet_style,
+		LeafletPointStyle: leaflet_point_style,
+		ProtomapsTheme:    protomaps_theme,
 	}
 
-	switch map_provider {
-	case "leaflet":
+	err := maps.AssignMapConfigHandler(opts, mux, "/map.json")
 
-		leaflet_cfg := &maps.LeafletConfig{}
-
-		if leaflet_style != "" {
-
-			s, err := maps.UnmarshalLeafletStyle(leaflet_style)
-
-			if err != nil {
-				log.Fatalf("Failed to unmarshal leaflet style, %v", err)
-			}
-
-			leaflet_cfg.Style = s
-		}
-
-		if leaflet_point_style != "" {
-
-			s, err := maps.UnmarshalLeafletStyle(leaflet_point_style)
-
-			if err != nil {
-				log.Fatalf("Failed to unmarshal leaflet point style, %v", err)
-			}
-
-			leaflet_cfg.PointStyle = s
-
-		}
-
-		map_cfg.Leaflet = leaflet_cfg
-
-	case "protomaps":
-
-		u, err := url.Parse(map_tile_uri)
-
-		if err != nil {
-			log.Fatalf("Failed to parse Protomaps tile URL, %v", err)
-		}
-
-		switch u.Scheme {
-		case "file":
-
-			mux_url, mux_handler, err := maps.ProtomapsFileHandlerFromPath(u.Path, "")
-
-			if err != nil {
-				log.Fatalf("Failed to determine absolute path for '%s', %v", map_tile_uri, err)
-			}
-
-			mux.Handle(mux_url, mux_handler)
-			map_cfg.TileURL = mux_url
-
-		case "api":
-			key := u.Host
-			map_cfg.TileURL = strings.Replace(maps.PROTOMAPS_API_TILE_URL, "{key}", key, 1)
-		}
-
-		map_cfg.Protomaps = &maps.ProtomapsConfig{
-			Theme: protomaps_theme,
-		}
+	if err != nil {
+		log.Fatalf("Failed to assign map config handler, %v", err)
 	}
-
-	map_cfg_handler := maps.MapConfigHandler(map_cfg)
-
-	mux.Handle("/map.json", map_cfg_handler)
 
 	www_fs := http.FS(www.FS)
 	www_handler := http.FileServer(www_fs)
@@ -126,7 +70,7 @@ func main() {
 	addr := fmt.Sprintf("%s:%d", host, port)
 	slog.Info("Listening for requests", "address", addr)
 
-	err := http.ListenAndServe(addr, mux)
+	err = http.ListenAndServe(addr, mux)
 
 	if err != nil {
 		log.Fatalf("Failed to serve requests, %v", err)
