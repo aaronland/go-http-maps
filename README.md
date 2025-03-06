@@ -2,85 +2,215 @@
 
 Go package providing opinionated HTTP middleware for web-based map tiles.
 
-## Important
+## Version 2
 
-This is work in progress. Documentation is incomplete.
+`/v2` of this package is not just a complete refactoring of the code but also a complete rethink about what its function is and how it works. There is basically nothing which is backwards compatible with previous versions.
 
-Until then have a look at [app/server/server.go](app/server/server.go), [templates/html/map.html](templates/html/map.html) and [static/javascript/aaronland.map.init.js](static/javascript/aaronland.map.init.js) for an example of working code.
+## Motivation
 
-## tools
+The original motivation for the `go-http-maps` package was to define a handful of top-level methods and `net/http` middleware handlers to manage the drudegry of setting up maps, with a variety of map providers (Leaflet, Protomaps, Nextzen/Tangramjs), It "worked" but, in the end, it was also not "easy".
 
-### server
+Version 2 removes most of the functionality of the `go-http-maps` package and instead focuses on a handful of methods for providing a dynamic map "config" file (exposed as an HTTP endpoint) which can be from the browser.
 
-An example HTTP server demonstrating the use of the `go-http-maps` package.
+This package no longer provides static asset handlers for Leaflet or Protomaps. It is left up to you to bundle (and serve) them from your own code. You could, if you wanted, define a custom `http.Handler` instance to load those files from the `github.com/aaronland/go-http-maps/v2/static/www.FS` embedded filesystem but that's still something you'll need to do on your own.
 
-```
-> ./bin/server -h
-  -initial-latitude float
-    	The starting latitude to position the map at. (default 37.61799)
-  -initial-longitude float
-    	The start longitude to position the map at. (default -122.370943)
-  -initial-zoom int
-    	The starting zoom level to position the map at. (default 12)
-  -javascript-at-eof
-    	An optional boolean flag to indicate that JavaScript resources (<script> tags) should be appended to the end of the HTML output.
-  -leaflet-enable-draw
-    	Enable the Leaflet.Draw plugin.
-  -leaflet-enable-fullscreen
-    	Enable the Leaflet.Fullscreen plugin.
-  -leaflet-enable-hash
-    	Enable the Leaflet.Hash plugin. (default true)
-  -leaflet-tile-url string
-    	A valid Leaflet 'tileLayer' layer URL. Only necessary if -map-provider is "leaflet".
-  -map-prefix string
-    	...
-  -map-provider string
-    	The name of the map provider to use. Valid options are: leaflet, null, protomaps
-  -protomaps-bucket-uri string
-    	The gocloud.dev/blob.Bucket URI where Protomaps tiles are stored. Only necessary if -map-provider is "protomaps" and -protomaps-serve-tiles is true.
-  -protomaps-caches-size int
-    	The size of the internal Protomaps cache if serving tiles locally. Only necessary if -map-provider is "protomaps" and -protomaps-serve-tiles is true. (default 64)
-  -protomaps-database string
-    	The name of the Protomaps database to serve tiles from. Only necessary if -map-provider is "protomaps" and -protomaps-serve-tiles is true.
-  -protomaps-label-rules-uri gocloud.dev/runtimevar
-    	// An optional gocloud.dev/runtimevar URI referencing a custom Javascript variable used to define Protomaps label rules.
-  -protomaps-paint-rules-uri gocloud.dev/runtimevar
-    	// An optional gocloud.dev/runtimevar URI referencing a custom Javascript variable used to define Protomaps paint rules.
-  -protomaps-serve-tiles
-    	A boolean flag signaling whether to serve Protomaps tiles locally. Only necessary if -map-provider is "protomaps".
-  -protomaps-tile-url string
-    	A valid Protomaps .pmtiles URL for loading map tiles. Only necessary if -map-provider is "protomaps". (default "/tiles/")
-  -rollup-assets
-    	An optional boolean flag to indicate that multiple JavaScript and CSS assets should be minified and combined in to single files.
-  -server-uri string
-    	A valid aaronland/go-http-server URI (default "http://localhost:8080")
-```
+## Documentation
 
-### Example
+`godoc` is still incomplete at this time.
 
-#### protomaps
+## Usage
 
-![](docs/images/http-maps-protomaps.png)
+The easiest usage example is the [cmd/example](cmd/example/main.go) tool:
 
 ```
-go run -mod vendor cmd/server/main.go \
-	-map-provider protomaps \
-	-protomaps-serve-tiles \
-	-protomaps-bucket-uri file:///{PATH_TO}/go-http-maps/fixtures
-	-protomaps-database sfo
+package main
+
+import (
+	"flag"
+	"fmt"
+	"log"
+	"log/slog"
+	"net/http"
+
+	"github.com/aaronland/go-http-maps/v2"
+	"github.com/aaronland/go-http-maps/v2/static/www"
+)
+
+func main() {
+
+	var verbose bool
+	var host string
+	var port int
+
+	var initial_view string
+	var map_provider string
+	var map_tile_uri string
+	var protomaps_theme string
+	var leaflet_style string
+	var leaflet_point_style string
+
+	flag.StringVar(&host, "host", "localhost", "The host to listen for requests on")
+	flag.IntVar(&port, "port", 8080, "The port number to listen for requests on")
+	flag.BoolVar(&verbose, "verbose", false, "Enable verbose (debug) logging.")
+
+	flag.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
+	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
+	flag.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
+	flag.StringVar(&leaflet_style, "leaflet_style", "", "A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.")
+	flag.StringVar(&leaflet_point_style, "leaflet_point_style", "", "A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.")
+	flag.StringVar(&initial_view, "initial-view", "", "A comma-separated string indicating the map's initial view. Valid options are: 'LON,LAT', 'LON,LAT,ZOOM' or 'MINX,MINY,MAXX,MAXY'.")
+
+	flag.Parse()
+
+	if verbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+		slog.Debug("Verbose logging enabled")
+	}
+
+	mux := http.NewServeMux()
+
+	opts := &maps.AssignMapConfigHandlerOptions{
+		MapProvider:       map_provider,
+		MapTileURI:        map_tile_uri,
+		InitialView:       initial_view,
+		LeafletStyle:      leaflet_style,
+		LeafletPointStyle: leaflet_point_style,
+		ProtomapsTheme:    protomaps_theme,
+	}
+
+	maps.AssignMapConfigHandler(opts, mux, "/map.json")
+	
+	www_fs := http.FS(www.FS)
+	www_handler := http.FileServer(www_fs)
+
+	mux.Handle("/", www_handler)
+
+	addr := fmt.Sprintf("%s:%d", host, port)
+	slog.Info("Listening for requests", "address", addr)
+
+	http.ListenAndServe(addr, mux)
+}
 ```
 
-#### leafet
+_Error handling omitted for the sake of brevity._
 
-![](docs/images/http-maps-leaflet.png)
+The "nut" of it being this part:
 
 ```
-go run -mod vendor cmd/server/main.go \
-	-map-provider leaflet
-	-leaflet-tile-url https://tile.openstreetmap.org/{z}/{x}/{y}.png
+	opts := &maps.AssignMapConfigHandlerOptions{
+		MapProvider:       map_provider,
+		MapTileURI:        map_tile_uri,
+		InitialView:       initial_view,
+		LeafletStyle:      leaflet_style,
+		LeafletPointStyle: leaflet_point_style,
+		ProtomapsTheme:    protomaps_theme,
+	}
+
+	maps.AssignMapConfigHandler(opts, mux, "/map.json")
 ```
 
-## See also
+Which populates the `maps.AssignMapConfigHandlerOptions` with map-specific command line flags and passes those options (along with your `http.ServeMux` instance) to the `AssignMapConfigHandler` ethod. This method will validate all the options and create a new map config `http.Handler` assigning it to the `http.ServeMux` instance.
 
-* https://github.com/aaronland/go-http-leaflet
-* https://github.com/aaronland/go-http-protomaps
+If you are using Protomaps as your map provider and the corresponding `MapTileURI` starts with `file://` it will be assumed that you are trying to serve a local Protomaps database and a matching `http.Handler` will assign to the `http.ServeMux` instance.
+
+And then in your JavaScript code you would write something like this:
+
+```
+window.addEventListener("load", function load(event){
+
+    // Null Island    
+    var map = L.map('map').setView([0.0, 0.0], 1);    
+
+    fetch("/map.json")
+        .then((rsp) => rsp.json())
+        .then((cfg) => {
+
+	    console.debug("Got map config", cfg);
+	    
+            switch (cfg.provider) {
+                case "leaflet":
+
+                    var tile_url = cfg.tile_url;
+
+                    var tile_layer = L.tileLayer(tile_url, {
+                        maxZoom: 19,
+                    });
+
+                    tile_layer.addTo(map);
+                    break;
+
+                case "protomaps":
+
+                    var tile_url = cfg.tile_url;
+
+                    var tile_layer = protomapsL.leafletLayer({
+                        url: tile_url,
+                        theme: cfg.protomaps.theme,
+                    })
+
+                    tile_layer.addTo(map);
+                    break;
+
+                default:
+                    console.error("Uknown or unsupported map provider");
+                    return;
+	    }
+
+	    if (cfg.initial_view) {
+
+		var zm = map.getZoom();
+
+		if (cfg.initial_zoom){
+		    zm = cfg.initial_zoom;
+		}
+
+		map.setView([cfg.initial_view[1], cfg.initial_view[0]], zm);
+		
+	    } else if (cfg.initial_bounds){
+
+		var bounds = [
+		    [ cfg.initial_bounds[1], cfg.initial_bounds[0] ],
+		    [ cfg.initial_bounds[3], cfg.initial_bounds[2] ],
+		];
+
+		map.fitBounds(bounds);
+	    }
+	    
+	    console.debug("Finished map setup");
+	    
+        }).catch((err) => {
+	    console.error("Failed to derive map config", err);
+	    return;
+	});    
+    
+});
+```
+
+## Example
+
+### Leaflet
+
+![](docs/images/go-http-maps-leaflet.png)
+
+```
+$> make example
+go run cmd/example/main.go \
+		-initial-view '-122.384292,37.621131,13'
+		
+2025/03/06 10:00:09 INFO Listening for requests address=localhost:8080
+```
+
+### Protomaps
+
+![](docs/images/go-http-maps-protomaps.png)
+
+```
+$> make example-protomaps
+go run cmd/example/main.go \
+		-initial-view '-122.384292,37.621131,13' \
+		-map-provider protomaps \
+		-map-tile-uri 'file:///usr/local/go-http-maps/fixtures/sfo.pmtiles'
+		
+2025/03/06 09:59:05 INFO Listening for requests address=localhost:8080
+```
+
