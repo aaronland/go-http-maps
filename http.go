@@ -31,15 +31,24 @@ func MapConfigHandler(cfg *MapConfig) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+// AssignMapConfigHandlerOptions defines configuration options for the AssignMapConfigHandler method.
 type AssignMapConfigHandlerOptions struct {
-	MapProvider       string
-	MapTileURI        string
-	InitialView       string
-	LeafletStyle      string
+	// A string label indicating the map provider to use. Valid options are: leaflet, protomaps.
+	MapProvider string
+	// A valid Leaflet tile layer URI.
+	MapTileURI string
+	// A comma-separated string indicating the map's initial view. Valid options are: 'LON,LAT', 'LON,LAT,ZOOM' or 'MINX,MINY,MAXX,MAXY'.
+	InitialView string
+	// A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.
+	LeafletStyle string
+	// A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.
 	LeafletPointStyle string
-	ProtomapsTheme    string
+	// A valid Protomaps theme label.
+	ProtomapsTheme string
 }
 
+// AssignMapConfigHandler derives a new `MapConfig` and corresponding `http.Handler` instance from 'opts' assigning
+// to 'mux' at 'map_cfg_uri'.
 func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.ServeMux, map_cfg_uri string) error {
 
 	map_cfg := &MapConfig{
@@ -66,7 +75,7 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 				return fmt.Errorf("Failed to parse latitude, %w", err)
 			}
 
-			map_cfg.InitialView = [2]float64{lon, lat}
+			map_cfg.InitialView = &InitialView{lon, lat}
 
 		case 3:
 
@@ -88,7 +97,7 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 				return fmt.Errorf("Failed to parse zoom, %w", err)
 			}
 
-			map_cfg.InitialView = [2]float64{lon, lat}
+			map_cfg.InitialView = &InitialView{lon, lat}
 			map_cfg.InitialZoom = zoom
 
 		case 4:
@@ -117,7 +126,7 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 				return fmt.Errorf("Invalid maxy, %w", err)
 			}
 
-			map_cfg.InitialBounds = [4]float64{minx, miny, maxx, maxy}
+			map_cfg.InitialBounds = &InitialBounds{minx, miny, maxx, maxy}
 
 		default:
 			return fmt.Errorf("Invalid initial view. Must be: 'lon,lat' or 'lon,lat,zoom' or 'minx,miny,maxx, maxy'")
