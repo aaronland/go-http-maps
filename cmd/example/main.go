@@ -24,7 +24,8 @@ func main() {
 	var map_tile_uri string
 	var protomaps_theme string
 
-	var style string
+	var leaflet_style string
+	var leaflet_point_style string
 
 	flag.StringVar(&host, "host", "localhost", "The host to listen for requests on")
 	flag.IntVar(&port, "port", 8080, "The port number to listen for requests on")
@@ -32,7 +33,8 @@ func main() {
 	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
 	flag.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
 
-	flag.StringVar(&style, "style", "", "A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.")
+	flag.StringVar(&leaflet_style, "leaflet_style", "", "A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.")
+	flag.StringVar(&leaflet_point_style, "leaflet_point_style", "", "A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.")
 
 	flag.BoolVar(&verbose, "verbose", false, "Enable verbose (debug) logging.")
 
@@ -50,10 +52,39 @@ func main() {
 	map_cfg := &maps.MapConfig{
 		Provider: map_provider,
 		TileURL:  map_tile_uri,
-		// Style:           style,
 	}
 
-	if map_provider == "protomaps" {
+	switch map_provider {
+	case "leaflet":
+
+		leaflet_cfg := &maps.LeafletConfig{}
+
+		if leaflet_style != "" {
+
+			s, err := maps.UnmarshalLeafletStyle(leaflet_style)
+
+			if err != nil {
+				log.Fatalf("Failed to unmarshal leaflet style, %v", err)
+			}
+
+			leaflet_cfg.Style = s
+		}
+
+		if leaflet_point_style != "" {
+
+			s, err := maps.UnmarshalLeafletStyle(leaflet_point_style)
+
+			if err != nil {
+				log.Fatalf("Failed to unmarshal leaflet point style, %v", err)
+			}
+
+			leaflet_cfg.PointStyle = s
+
+		}
+
+		map_cfg.Leaflet = leaflet_cfg
+
+	case "protomaps":
 
 		u, err := url.Parse(map_tile_uri)
 

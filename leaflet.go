@@ -10,6 +10,11 @@ import (
 
 const LEAFLET_OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
+type LeafletConfig struct {
+	Style      *LeafletStyle `json:"style,omitempty"`
+	PointStyle *LeafletStyle `json:"point_style,omitempty"`
+}
+
 // LeafletStyle is a struct containing details for decorating GeoJSON features and markers
 type LeafletStyle struct {
 	Color       string  `json:"color,omitempty"`
@@ -20,9 +25,9 @@ type LeafletStyle struct {
 	FillOpacity float64 `json:"fillOpacity,omitempty"`
 }
 
-// UnmarshalStyle derives a `LeafletStyle` instance from 'raw'. If 'raw' starts with "{" then it is treated as
+// UnmarshalLeafletStyle derives a `LeafletStyle` instance from 'raw'. If 'raw' starts with "{" then it is treated as
 // a JSON-encoded string, otherwise it is treated as a local path on disk.
-func UnmarshalStyle(raw string) (*LeafletStyle, error) {
+func UnmarshalLeafletStyle(raw string) (*LeafletStyle, error) {
 
 	raw = strings.TrimSpace(raw)
 
