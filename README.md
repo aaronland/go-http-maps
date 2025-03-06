@@ -8,15 +8,19 @@ Go package providing opinionated HTTP middleware for web-based map tiles.
 
 ## Motivation
 
+The original motivation for the `go-http-maps` package was to define a handful of top-level methods and `net/http` middleware handlers to manage the drudegry of setting up maps, with a variety of map providers (Leaflet, Protomaps, Nextzen/Tangramjs), It "worked" but, in the end, it was also not "easy".
+
+Version 2 removes most of the functionality of the `go-http-maps` package and instead focuses on a handful of methods for providing a dynamic map "config" file (exposed as an HTTP endpoint) which can be from the browser.
+
 This package no longer provides static asset handlers for Leaflet or Protomaps. It is left up to you to bundle (and serve) them from your own code. You could, if you wanted, define a custom `http.Handler` instance to load those files from the `github.com/aaronland/go-http-maps/v2/static/www.FS` embedded filesystem but that's still something you'll need to do on your own.
 
 ## Documentation
 
 `godoc` is still incomplete at this time.
 
-## Example
+## Usage
 
-The easiest example is the [cmd/example](cmd/example/main.go) tool:
+The easiest usage example is the [cmd/example](cmd/example/main.go) tool:
 
 ```
 package main
@@ -182,4 +186,31 @@ window.addEventListener("load", function load(event){
 });
 ```
 
+## Example
+
+### Leaflet
+
+![](docs/images/go-http-maps-leaflet.png)
+
+```
+$> make example
+go run cmd/example/main.go \
+		-initial-view '-122.384292,37.621131,13'
+		
+2025/03/06 10:00:09 INFO Listening for requests address=localhost:8080
+```
+
+### Protomaps
+
+![](docs/images/go-http-maps-protomaps.png)
+
+```
+$> make example-protomaps
+go run cmd/example/main.go \
+		-initial-view '-122.384292,37.621131,13' \
+		-map-provider protomaps \
+		-map-tile-uri 'file:///usr/local/go-http-maps/fixtures/sfo.pmtiles'
+		
+2025/03/06 09:59:05 INFO Listening for requests address=localhost:8080
+```
 
