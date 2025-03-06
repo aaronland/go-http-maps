@@ -10,5 +10,5 @@ type MapConfig struct {
 	Protomaps       *ProtomapsConfig `json:"protomaps,omitempty"`
 	Style           *LeafletStyle    `json:"style,omitempty"`
 	PointStyle      *LeafletStyle    `json:"point_style,omitempty"`
-	LabelProperties []string         `json:"label_properties"`
+	LabelProperties []string         `json:"label_properties,omitempty"`
 }

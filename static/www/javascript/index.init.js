@@ -7,6 +7,8 @@ window.addEventListener("load", function load(event){
         .then((rsp) => rsp.json())
         .then((cfg) => {
 
+	    console.debug("Got map config", cfg);
+	    
             switch (cfg.provider) {
                 case "leaflet":
 
@@ -37,7 +39,8 @@ window.addEventListener("load", function load(event){
 	    }
 
 	    // To do: Set bounding box from configs (if defined)
-
+	    
+	    console.debug("Finished map setup");
 	    
         }).catch((err) => {
 	    console.error("Failed to derive map config", err);

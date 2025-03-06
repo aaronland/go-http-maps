@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// MapConfigHandler returns a new `http.Handler` that will return a JSON-encoded version of 'cfg'.
 func MapConfigHandler(cfg *MapConfig) http.Handler {
 
 	fn := func(rsp http.ResponseWriter, req *http.Request) {

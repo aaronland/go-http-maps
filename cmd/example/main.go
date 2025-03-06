@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "context"
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -17,7 +17,8 @@ func main() {
 
 	var verbose bool
 
-	// var server_uri string
+	var host string
+	var port int
 
 	var map_provider string
 	var map_tile_uri string
@@ -25,7 +26,8 @@ func main() {
 
 	var style string
 
-	// flag.StringVar(&server_uri, "server-uri", "http://localhost:8080", "...")
+	flag.StringVar(&host, "host", "localhost", "The host to listen for requests on")
+	flag.IntVar(&port, "port", 8080, "The port number to listen for requests on")
 	flag.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
 	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
 	flag.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
@@ -90,9 +92,9 @@ func main() {
 
 	mux.Handle("/", www_handler)
 
-	addr := "localhost:8080"
+	addr := fmt.Sprintf("%s:%d", host, port)
 	slog.Info("Listening for requests", "address", addr)
-	
+
 	err := http.ListenAndServe(addr, mux)
 
 	if err != nil {
