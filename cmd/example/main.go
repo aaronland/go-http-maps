@@ -28,6 +28,7 @@ func main() {
 	var leaflet_style string
 	var leaflet_point_style string
 	var leaflet_label_properties multi.MultiString
+	var leaflet_panes multi.KeyValueInt64
 
 	flag.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
 	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
@@ -36,6 +37,8 @@ func main() {
 	flag.StringVar(&leaflet_point_style, "leaflet-point-style", "", "A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.")
 
 	flag.Var(&leaflet_label_properties, "leaflet-label-property", "Zero or more (GeoJSON Feature) properties to use to construct a label for a feature's popup menu when it is clicked on.")
+
+	flag.Var(&leaflet_panes, "leaflet-pane", "Zero or more {LABEL}={Z_INDEX} pairs used to define Leaflet pane information.")
 
 	flag.StringVar(&initial_view, "initial-view", "", "A comma-separated string indicating the map's initial view. Valid options are: 'LON,LAT', 'LON,LAT,ZOOM' or 'MINX,MINY,MAXX,MAXY'.")
 
@@ -60,6 +63,17 @@ func main() {
 		LeafletPointStyle:      leaflet_point_style,
 		LeafletLabelProperties: leaflet_label_properties,
 		ProtomapsTheme:         protomaps_theme,
+	}
+
+	if len(leaflet_panes) > 0 {
+
+		panes := make(map[string]int)
+
+		for _, fl := range leaflet_panes {
+			panes[fl.Key()] = int(fl.Value().(int64))
+		}
+
+		opts.LeafletPanes = panes
 	}
 
 	err := maps.AssignMapConfigHandler(opts, mux, "/map.json")
