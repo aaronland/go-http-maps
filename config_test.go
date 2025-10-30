@@ -31,10 +31,8 @@ func TestMapConfig(t *testing.T) {
 		t.Fatalf("Failed to unmarshal config, %v", err)
 	}
 
-	
 	if cfg2.InitialView.String() != cfg.InitialView.String() {
 		t.Fatalf("Invalid roundt trip for initial view")
 	}
-
 
 }
