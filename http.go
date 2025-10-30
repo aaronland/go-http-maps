@@ -3,11 +3,16 @@ package maps
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/protomaps/go-pmtiles/pmtiles"
+	pm_http "github.com/sfomuseum/go-sfomuseum-pmtiles/http"
 )
 
 // MapConfigHandler returns a new `http.Handler` that will return a JSON-encoded version of 'cfg'.
@@ -175,6 +180,45 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 		}
 
 		switch u.Scheme {
+		case "server":
+
+			q := u.Query()
+			uri := q.Get("uri")
+
+			if uri == "" {
+				return fmt.Errorf("Missing ?uri= parameter")
+			}
+
+			prefix := u.Path
+
+			if prefix == "" {
+				return fmt.Errorf("URI missing path component (or empty)")
+			}
+
+			logger := log.Default()
+
+			slog.Info("SERVER", "tiles", uri)
+			pmtiles_server, err := pmtiles.NewServer(uri, prefix, logger, 64, "")
+
+			if err != nil {
+				return fmt.Errorf("Failed to create PMTiles server, %w", err)
+			}
+
+			tile_handler := pm_http.TileHandler(pmtiles_server, logger)
+			tile_handler = http.StripPrefix(prefix, tile_handler)
+
+			fname := filepath.Base(uri)
+			fname = strings.Replace(fname, filepath.Ext(uri), "", 1)
+
+			tiles_uri := filepath.Join(prefix, fname)
+			tiles_uri = filepath.Join(tiles_uri, "{z}/{x}/{y}.mvt")
+
+			mux.Handle(prefix, tile_handler)
+			map_cfg.TileURL = tiles_uri
+
+			// /tiles/sfo/14/2622/6341.mvt
+			slog.Info("SERVER", "tiles URI", tiles_uri)
+
 		case "file":
 
 			mux_url, mux_handler, err := ProtomapsFileHandlerFromPath(u.Path, "")
