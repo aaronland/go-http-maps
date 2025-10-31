@@ -24,6 +24,7 @@ func main() {
 	var map_provider string
 	var map_tile_uri string
 	var protomaps_theme string
+	var protomaps_max_data_zoom int
 
 	var leaflet_style string
 	var leaflet_point_style string
@@ -33,6 +34,7 @@ func main() {
 	flag.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
 	flag.StringVar(&map_tile_uri, "map-tile-uri", maps.LEAFLET_OSM_TILE_URL, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
 	flag.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
+	flag.IntVar(&protomaps_max_data_zoom, "protomaps-max-data-zoom", 0, "The maximum zoom (tile) level for data in a PMTiles database")
 	flag.StringVar(&leaflet_style, "leaflet-style", "", "A custom Leaflet style definition for geometries. This may either be a JSON-encoded string or a path on disk.")
 	flag.StringVar(&leaflet_point_style, "leaflet-point-style", "", "A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.")
 
@@ -63,6 +65,7 @@ func main() {
 		LeafletPointStyle:      leaflet_point_style,
 		LeafletLabelProperties: leaflet_label_properties,
 		ProtomapsTheme:         protomaps_theme,
+		ProtomapsMaxDataZoom:   protomaps_max_data_zoom,
 	}
 
 	if len(leaflet_panes) > 0 {
