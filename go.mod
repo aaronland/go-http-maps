@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/protomaps/go-pmtiles v1.28.2
+	github.com/sfomuseum/go-flags v0.11.0
 	github.com/sfomuseum/go-sfomuseum-pmtiles v1.4.1
 )
 

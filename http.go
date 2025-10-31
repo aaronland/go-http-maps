@@ -48,6 +48,10 @@ type AssignMapConfigHandlerOptions struct {
 	LeafletStyle string
 	// A custom Leaflet style definition for points. This may either be a JSON-encoded string or a path on disk.
 	LeafletPointStyle string
+	// Zero or more (GeoJSON Feature) properties to use to construct a label for a feature's popup menu when it is clicked on.
+	LeafletLabelProperties []string
+	// A dictionary defining Leaflet label pane names and their z-index values.
+	LeafletPanes map[string]int
 	// A valid Protomaps theme label.
 	ProtomapsTheme string
 }
@@ -141,7 +145,7 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 	switch opts.MapProvider {
 	case "leaflet":
 
-		if opts.LeafletStyle != "" && opts.LeafletPointStyle != "" {
+		if opts.LeafletStyle != "" || opts.LeafletPointStyle != "" {
 
 			leaflet_cfg := &LeafletConfig{}
 
@@ -165,7 +169,6 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 				}
 
 				leaflet_cfg.PointStyle = s
-
 			}
 
 			map_cfg.Leaflet = leaflet_cfg
@@ -238,6 +241,31 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 		map_cfg.Protomaps = &ProtomapsConfig{
 			Theme: opts.ProtomapsTheme,
 		}
+	}
+
+	switch opts.MapProvider {
+	case "leaflet", "protomaps":
+
+		if len(opts.LeafletLabelProperties) > 0 {
+
+			if map_cfg.Leaflet == nil {
+				map_cfg.Leaflet = &LeafletConfig{}
+			}
+
+			map_cfg.Leaflet.LabelProperties = opts.LeafletLabelProperties
+		}
+
+		if opts.LeafletPanes != nil {
+
+			if map_cfg.Leaflet == nil {
+				map_cfg.Leaflet = &LeafletConfig{}
+			}
+
+			map_cfg.Leaflet.Panes = opts.LeafletPanes
+		}
+
+	default:
+		// pass
 	}
 
 	map_cfg_handler := MapConfigHandler(map_cfg)
