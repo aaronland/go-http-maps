@@ -198,14 +198,21 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 				return fmt.Errorf("URI missing path component (or empty)")
 			}
 
+			prefix = strings.TrimRight(prefix, "/")
+			prefix = fmt.Sprintf("%s/", prefix)
+
 			logger := log.Default()
 
-			slog.Info("SERVER", "tiles", uri)
-			pmtiles_server, err := pmtiles.NewServer(uri, prefix, logger, 64, "")
+			root := filepath.Dir(uri)
+			root_uri := fmt.Sprintf("file://%s", root)
+
+			pmtiles_server, err := pmtiles.NewServer(root_uri, prefix, logger, 64, "")
 
 			if err != nil {
 				return fmt.Errorf("Failed to create PMTiles server, %w", err)
 			}
+
+			pmtiles_server.Start()
 
 			tile_handler := pm_http.TileHandler(pmtiles_server, logger)
 			tile_handler = http.StripPrefix(prefix, tile_handler)
@@ -219,8 +226,7 @@ func AssignMapConfigHandler(opts *AssignMapConfigHandlerOptions, mux *http.Serve
 			mux.Handle(prefix, tile_handler)
 			map_cfg.TileURL = tiles_uri
 
-			// /tiles/sfo/14/2622/6341.mvt
-			slog.Info("SERVER", "tiles URI", tiles_uri)
+			slog.Info("SERVER", "tiles URI", tiles_uri, "prefix", prefix)
 
 		case "file":
 
