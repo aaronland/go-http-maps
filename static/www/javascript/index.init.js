@@ -26,6 +26,58 @@ window.addEventListener("load", function load(event){
 
 		case "protomaps":
 
+		    cfg.protomaps.theme = null;
+		    cfg.protomaps.paintRules = [
+			{
+			    dataLayer:"water",
+			    symbolizer:new protomapsL.PolygonSymbolizer({fill:"#354855"})
+			},
+			{
+			    dataLayer: "roads",
+			    symbolizer: new protomapsL.LineSymbolizer({color:"#fff"}),
+			},
+			{
+			    dataLayer: "landuse",
+			    symbolizer:new protomapsL.PolygonSymbolizer({fill:"#cccccc"})
+			},
+			{
+			    dataLayer: "landuse",
+			    symbolizer:new protomapsL.PolygonSymbolizer({fill:"#999"}),
+			    filter: (props, ignore) => {
+				
+				if (props["area:aeroway"] == "runway"){
+				    return true;
+				}
+				
+				if (props["area:aeroway"] == "taxiway"){
+				    return true;
+				}
+				
+				if (props["aeroway"] == "runway"){
+				    return true;
+				}
+				
+				if (props["aeroway"] == "aerodrome"){
+				    return true;
+				}
+				
+				return false;
+			    }
+			},
+			{
+			    dataLayer: "transit",
+			    symbolizer: new protomapsL.LineSymbolizer({color:"#000"}),
+			    filter: (props, ignore) => {
+				
+				if (props["pmap:kind"] = "aeroway"){
+				    return true;
+				}
+				
+				return false;
+			    }
+			}
+		    ];
+		    
 		    leaflet_map = L.map('map').setView(null_island, 1);
 
 		    var tile_args = {
