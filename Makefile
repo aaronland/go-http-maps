@@ -16,6 +16,20 @@ example-pm:
 		-protomaps-max-data-zoom 14 \
 		-map-tile-uri 'file://$(CWD)/fixtures/sfo.pmtiles'
 
+example-pm-paint:
+	go run cmd/example/main.go \
+		-initial-view '$(INITIAL_VIEW)' \
+		-map-provider protomaps-paint \
+		-protomaps-max-data-zoom 14 \
+		-map-tile-uri 'file://$(CWD)/fixtures/sfo.pmtiles'
+
+example-pm-raster:
+	go run cmd/example/main.go \
+		-initial-view '$(INITIAL_VIEW)' \
+		-map-provider protomaps-raster \
+		-protomaps-max-data-zoom 14 \
+		-map-tile-uri https://static.sfomuseum.org/aerial/1936.pmtiles
+
 example-pm-ml:
 	go run cmd/example/main.go \
 		-initial-view '$(INITIAL_VIEW)' \
