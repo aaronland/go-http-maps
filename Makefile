@@ -9,9 +9,16 @@ example:
 		-leaflet-pane world=200 \
 		-initial-view '$(INITIAL_VIEW)'
 
-example-protomaps:
+example-pm:
 	go run cmd/example/main.go \
 		-initial-view '$(INITIAL_VIEW)' \
 		-map-provider protomaps \
+		-protomaps-max-data-zoom 14 \
+		-map-tile-uri 'file://$(CWD)/fixtures/sfo.pmtiles'
+
+example-pm-ml:
+	go run cmd/example/main.go \
+		-initial-view '$(INITIAL_VIEW)' \
+		-map-provider protomaps-ml \
 		-protomaps-max-data-zoom 14 \
 		-map-tile-uri 'file://$(CWD)/fixtures/sfo.pmtiles'

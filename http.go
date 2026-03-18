@@ -190,7 +190,7 @@ func MapConfigFromOptions(opts *AssignMapConfigHandlerOptions) (*MapConfig, erro
 			map_cfg.Leaflet = leaflet_cfg
 		}
 
-	case "protomaps":
+	case "protomaps", "protomaps-ml", "protomaps-raster":
 
 		u, err := url.Parse(opts.MapTileURI)
 
