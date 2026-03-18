@@ -28,14 +28,28 @@ window.addEventListener("load", function load(event){
 
 		    leaflet_map = L.map('map').setView(null_island, 1);
 
-		    var tile_layer = protomapsL.leafletLayer({
+		    var tile_args = {
 			url: cfg.tile_url,
-			flavor: cfg.protomaps.theme,
-		    });
+		    };
+
+		    if (cfg.protomaps.theme){
+			tile_args.flavor = cfg.protomaps.theme;
+		    }
+
+		    if (cfg.protomaps.paintRules){
+			tile_args.paintRules = cfg.protomaps.paintRules;
+		    }
+
+		    if (cfg.protomaps.labelRules){
+			tile_args.labelRules = cfg.protomaps.labelRules;
+		    }
+		    
+		    var tile_layer = protomapsL.leafletLayer(tile_args);
 		    
 		    tile_layer.addTo(leaflet_map);
 		    break;
-		    
+
+
                 case "protomaps-raster":
 		    
 		    leaflet_map = L.map('map').setView(null_island, 1);    		    		    
