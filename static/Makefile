@@ -2,7 +2,7 @@ LEAFLET_VERSION=1.9.4
 PROTOMAPS_LEAFLET_VERSION4=4.0.1
 PROTOMAPS_LEAFLET_VERSION5=5.1.0
 PMTILES_VERSION=4.4.0
-MAPLIBRE_VERSION=5.13.0
+MAPLIBRE_VERSION=5.21.1
 
 maplibre:
 	curl -s -o www/css/maplibre-gl-$(MAPLIBRE_VERSION).css https://unpkg.com/maplibre-gl@$(MAPLIBRE_VERSION)/dist/maplibre-gl.css
