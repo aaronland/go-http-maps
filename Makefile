@@ -1,7 +1,12 @@
-GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
 CWD=$(shell pwd)
 
+GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
+LDFLAGS=-s -w
+
 INITIAL_VIEW=-122.384292,37.621131,13
+
+vuln:
+	govulncheck -show verbose ./...
 
 example:
 	go run cmd/example/main.go \
